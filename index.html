@@ -1,1455 +1,233 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tối ưu Dãy Nhị Phân 5-bit</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-        
-        .container {
-            background: red;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #ffffff;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-        
-        .input-section {
-            background: #f7fafc;
-            padding: 25px;
-            border-radius: 10px;
-            border: 2px solid #e2e8f0;
-            margin-bottom: 30px;
-        }
-        
-        .input-section h2 {
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-        
-        .input-methods {
-            margin-bottom: 20px;
-        }
-        
-        .method-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .tab-btn {
-            background: #4a5568;
-            color: #e2e8f0;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .tab-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .method-content {
-            margin-top: 15px;
-        }
-        
-        .sequence-input {
-            width: 90%;
-            padding: 15px;
-            font-size: 16px;
-            border: 2px solid #4a5568;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            resize: vertical;
-            min-height: 150px;
-            transition: all 0.3s ease;
-            background: #1a202c;
-            color: #e2e8f0;
-            line-height: 1.5;
-        }
-        
-        .sequence-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .current-line {
-            background: #e3f2fd;
-            border: 2px solid #667eea;
-        }
-        
-        .bit-grid-container {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 2px solid #4a5568;
-            border-radius: 10px;
-            padding: 20px;
-            background: #1a202c;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .add-sequence-btn {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .sequences-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .sequence-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: #2d3748;
-            border-radius: 8px;
-            border: 1px solid #4a5568;
-            width: 100%;
-            box-sizing: border-box;
-            flex-wrap: wrap;
-        }
-        
-        .sequence-label {
-            font-weight: bold;
-            color: #e2e8f0;
-            min-width: 80px;
-        }
-        
-        .sequence-bits {
-            display: flex;
-            gap: 8px;
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .bit-input-small {
-            width: 40px;
-            height: 40px;
-            font-size: 18px;
-            text-align: center;
-            border: 2px solid #4a5568;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            background: #1a202c;
-            color: #e2e8f0;
-        }
-        
-        .bit-input-small:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: scale(1.05);
-        }
-        
-        .bit-input-small.valid {
-            border-color: #48bb78;
-            background: #2d5a3d;
-            color: #e2e8f0;
-        }
-        
-        .bit-input-small.invalid {
-            border-color: #f56565;
-            background: #5a2d2d;
-            color: #e2e8f0;
-        }
-        
-        .remove-sequence-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .remove-sequence-btn:hover {
-            background: #c82333;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        button:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .error-message {
-            background: yellow;
-            color: #c53030;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .analysis-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .analysis-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #e9ecef;
-        }
-        
-        .analysis-card h3 {
-            color: #495057;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .frequency-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        
-        .frequency-table th,
-        .frequency-table td {
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #dee2e6;
-        }
-        
-        .frequency-table th {
-            background: #e9ecef;
-            font-weight: bold;
-        }
-        
-        .frequency-table .bit-0 {
-            background: #f8d7da;
-        }
-        
-        .frequency-table .bit-1 {
-            background: #d4edda;
-        }
-        
-        .prediction-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            color: white;
-            margin-top: 30px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s ease;
-        }
-        
-        .prediction-section.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .prediction-label {
-            font-size: 18px;
-            margin-bottom: 15px;
-            opacity: 0.9;
-        }
-        
-        .prediction-value {
-            font-size: 48px;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 20px 30px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        
-        .confidence-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        .confidence-bar {
-            width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #48bb78, #38a169);
-            transition: width 0.5s ease;
-            border-radius: 10px;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .stat-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-top: 5px;
-        }
-        
-        .pattern-list {
-            max-height: 200px;
-            overflow-y: auto;
-            background: white;
-            border-radius: 5px;
-            padding: 10px;
-        }
-        
-        .pattern-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .pattern-sequence {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
-        
-        .pattern-count {
-            color: #667eea;
-            font-weight: bold;
-        }
-        
-        .debug-info {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-        }
+<meta charset="UTF-8">
+<title>9 Dãy 5-bit</title>
 
-        .main-content {
-            display: block;
-            gap: 20px;
-            margin-bottom: 30px;
-            width: 100%;
-            box-sizing: border-box;
-        }
+<style>
+/* ===== BACKGROUND ===== */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 30px;
+    color: #fff;
+}
 
-        .box-section {
-            background: #2d3748;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            border: 1px solid #4a5568;
-            width: 100%;
-            box-sizing: border-box;
-        }
+/* ===== CONTAINER ===== */
+.container {
+    width: 100%;
+    max-width: 950px;
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+}
 
-        .box-section h2 {
-            color: #ffffff;
-            margin-bottom: 20px;
-            font-size: 20px;
-            text-align: center;
-            border-bottom: 2px solid #4a5568;
-            padding-bottom: 10px;
-        }
+/* ===== TITLE ===== */
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 30px;
+    letter-spacing: 1px;
+}
 
-        .box-content {
-            min-height: 200px;
-        }
+/* ===== BUTTON ===== */
+button {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.25s;
+}
 
-        .generate-all-section {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+}
 
-        .generate-all-btn {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
-        }
+/* ===== RESULT BOX ===== */
+.result-box {
+    background: rgba(0,0,0,0.35);
+    border: 2px solid #ffd166;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    margin: 0 auto 30px auto;
+    width: 50%;
+}
 
-        .generate-all-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
-        }
+.result-bits {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+}
 
-        .random-box {
-            background: #1a202c;
-            border: 1px solid #4a5568;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-        }
+.result-bit {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #ffd166, #f4a261);
+    color: #000;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .random-boxes-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+/* ===== TOP BUTTON ===== */
+.top-btn {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-        .random-box h3 {
-            color: #e2e8f0;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
+/* ===== GRID 9 BOXES ===== */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
 
-        .random-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 10px;
-        }
+/* ===== RANDOM BOX ===== */
+.random-box {
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.15);
+}
 
-        .random-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
-        }
+.random-box h4 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    opacity: 0.9;
+}
 
-        .random-bits-container {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 10px;
-        }
+.bits {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
 
-        .random-bit {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-        }
+.bit {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 6px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+}
 
-        .result-box {
-            background: #2d3748;
-            border: 2px solid #667eea;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            text-align: center;
-        }
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
-        .result-box h3 {
-            color: #ffffff;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .compare-btn {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 10px;
-        }
-
-        .compare-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(72, 187, 120, 0.3);
-        }
-
-        .result-bits-container {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .result-bit {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+@media (max-width: 480px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>🎯 Tối ưu Dãy Nhị Phân 5-bit</h1>
-        
-        <div class="main-content">
-            <!-- Hộp 1: Tạo dãy ngẫu nhiên -->
-            <div class="box-section">
-                <h2>🎲 Tạo Dãy Ngẫu Nhiên</h2>
-                <div class="box-content">
-                    <!-- Nút tạo tất cả -->
-                    <div class="generate-all-section">
-                        <button onclick="generateAllSequences()" class="generate-all-btn">🎲 Tạo cả 9 dãy</button>
-                    </div>
-                    
-                    <!-- 9 hộp trong 3 hàng ngang -->
-                    <div class="random-boxes-row">
-                        <!-- Hàng 1: Hộp 1-3 -->
-                        <div class="random-box">
-                            <h3>Dãy 1</h3>
-                            <button onclick="generateRandomSequence(1)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits1" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                        
-                        <div class="random-box">
-                            <h3>Dãy 2</h3>
-                            <button onclick="generateRandomSequence(2)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits2" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                        
-                        <div class="random-box">
-                            <h3>Dãy 3</h3>
-                            <button onclick="generateRandomSequence(3)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits3" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="random-boxes-row">
-                        <!-- Hàng 2: Hộp 4-6 -->
-                        <div class="random-box">
-                            <h3>Dãy 4</h3>
-                            <button onclick="generateRandomSequence(4)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits4" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                        
-                        <div class="random-box">
-                            <h3>Dãy 5</h3>
-                            <button onclick="generateRandomSequence(5)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits5" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                        
-                        <div class="random-box">
-                            <h3>Dãy 6</h3>
-                            <button onclick="generateRandomSequence(6)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits6" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="random-boxes-row">
-                        <!-- Hàng 3: Hộp 7-9 -->
-                        <div class="random-box">
-                            <h3>Dãy 7</h3>
-                            <button onclick="generateRandomSequence(7)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits7" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                        
-                        <div class="random-box">
-                            <h3>Dãy 8</h3>
-                            <button onclick="generateRandomSequence(8)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits8" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                        
-                        <div class="random-box">
-                            <h3>Dãy 9</h3>
-                            <button onclick="generateRandomSequence(9)" class="random-btn">🎲 Tạo dãy</button>
-                            <div id="randomBits9" class="random-bits-container">
-                                <!-- 5 ô sẽ được tạo bởi JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Hộp kết quả bên dưới -->
-                    <div class="result-box">
-                        <h3>📊 Kết Quả So Sánh</h3>
-                        <button onclick="compareBits()" class="compare-btn">🔍 So sánh thủ công</button>
-                        <div id="resultBits" class="result-bits-container">
-                            <!-- 5 ô kết quả sẽ được tạo tự động -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="analysisResults" class="analysis-section" style="display: none;">
-            <div class="analysis-card">
-                <h3>📊 Tần suất bit theo vị trí</h3>
-                <table id="frequencyTable" class="frequency-table">
-                    <thead>
-                        <tr>
-                            <th>Vị trí</th>
-                            <th>Bit 0</th>
-                            <th>Bit 1</th>
-                            <th>Chọn</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            
-            <div class="analysis-card">
-                <h3>🔄 Các dãy lặp lại</h3>
-                <div id="patternList" class="pattern-list"></div>
-            </div>
-            
-            <div class="analysis-card">
-                <h3>📈 Thống kê</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div id="totalSequences" class="stat-value">0</div>
-                        <div class="stat-label">Tổng dãy</div>
-                    </div>
-                    <div class="stat-item">
-                        <div id="uniqueSequences" class="stat-value">0</div>
-                        <div class="stat-label">Dãy độc nhất</div>
-                    </div>
-                    <div class="stat-item">
-                        <div id="mostCommon" class="stat-value">-</div>
-                        <div class="stat-label">Dãy phổ biến</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="debugInfo" class="debug-info" style="display: none;">
-            <h4>🔍 Debug Information</h4>
-            <div id="debugContent"></div>
-        </div>
-        
-        <div id="predictionSection" class="prediction-section">
-            <div class="prediction-label">🎲 Dự đoán tối ưu (xác suất trùng ≥1 bit cao nhất):</div>
-            <div id="predictionValue" class="prediction-value">00000</div>
-            
-            <div class="confidence-info">
-                <div>Xác suất trùng ít nhất 1 bit: <span id="confidenceLevel">0%</span></div>
-                <div class="confidence-bar">
-                    <div id="confidenceFill" class="confidence-fill" style="width: 0%"></div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div id="methodUsed" class="stat-value">-</div>
-                        <div class="stat-label">Phương pháp</div>
-                    </div>
-                    <div class="stat-item">
-                        <div id="improvement" class="stat-value">0%</div>
-                        <div class="stat-label">Cải thiện</div>
-                    </div>
-                    <div class="stat-item">
-                        <div id="expectedAccuracy" class="stat-value">0%</div>
-                        <div class="stat-label">Độ chính xác</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container">
+
+    <h1>🎯 9 Dãy Nhị Phân 5-bit</h1>
+
+    <!-- RESULT -->
+    <div class="result-box">
+        <h3>KẾT QUẢ SO SÁNH</h3>
+        <button onclick="compareAll()">So sánh 9 dãy</button>
+        <div id="resultBits" class="result-bits"></div>
     </div>
 
-    <script>
-        let historicalSequences = [];
-        let frequencyMatrix = [];
-        let patternFrequency = {};
-        let sequenceCount = 0;
-        let currentMethod = 'textarea';
+    <div class="top-btn">
+        <button onclick="generateAll()">🎲 Tạo cả 9 dãy</button>
+    </div>
 
-        function switchMethod(method) {
-            currentMethod = method;
-            
-            // Update tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Show/hide methods
-            if (method === 'textarea') {
-                document.getElementById('textareaMethod').style.display = 'block';
-                document.getElementById('bitgridMethod').style.display = 'none';
-            } else {
-                document.getElementById('textareaMethod').style.display = 'none';
-                document.getElementById('bitgridMethod').style.display = 'block';
-                if (sequenceCount === 0) {
-                    addNewSequence(); // Add first sequence if empty
-                }
-            }
-        }
-
-        function addNewSequence() {
-            sequenceCount++;
-            const grid = document.getElementById('sequencesGrid');
-            
-            const sequenceRow = document.createElement('div');
-            sequenceRow.className = 'sequence-row';
-            sequenceRow.id = `sequence-${sequenceCount}`;
-            
-            sequenceRow.innerHTML = `
-                <span class="sequence-label">Dãy ${sequenceCount}:</span>
-                <div class="sequence-bits">
-                    <input type="text" class="bit-input-small" maxlength="1" data-sequence="${sequenceCount}" data-pos="1">
-                    <input type="text" class="bit-input-small" maxlength="1" data-sequence="${sequenceCount}" data-pos="2">
-                    <input type="text" class="bit-input-small" maxlength="1" data-sequence="${sequenceCount}" data-pos="3">
-                    <input type="text" class="bit-input-small" maxlength="1" data-sequence="${sequenceCount}" data-pos="4">
-                    <input type="text" class="bit-input-small" maxlength="1" data-sequence="${sequenceCount}" data-pos="5">
-                </div>
-                <button class="remove-sequence-btn" onclick="removeSequence(${sequenceCount})">Xóa</button>
-            `;
-            
-            grid.appendChild(sequenceRow);
-            
-            // Add event listeners to new inputs
-            sequenceRow.querySelectorAll('.bit-input-small').forEach(input => {
-                input.addEventListener('input', function() {
-                    validateBitInput(this);
-                });
-                
-                input.addEventListener('keypress', function(e) {
-                    const char = String.fromCharCode(e.which);
-                    if (!/[01]/.test(char) && e.which !== 8 && e.which !== 46) {
-                        e.preventDefault();
-                    }
-                });
-                
-                input.addEventListener('keydown', function(e) {
-                    if (e.which === 8 && !this.value) {
-                        handleBackspace(this);
-                    }
-                });
-            });
-            
-            // Focus first input
-            setTimeout(() => {
-                sequenceRow.querySelector('.bit-input-small').focus();
-            }, 100);
-        }
-
-        function removeSequence(seqId) {
-            const element = document.getElementById(`sequence-${seqId}`);
-            if (element) {
-                element.remove();
-                checkAutoAnalyze();
-            }
-        }
-
-        function validateBitInput(input) {
-            const value = input.value.trim();
-            const errorElement = document.getElementById('inputError');
-            
-            // Reset error
-            errorElement.style.display = 'none';
-            errorElement.textContent = '';
-            
-            // If empty, reset classes
-            if (!value) {
-                input.classList.remove('valid', 'invalid');
-                return false;
-            }
-            
-            // Only allow 0 and 1
-            if (!/^[01]$/.test(value)) {
-                input.classList.remove('valid');
-                input.classList.add('invalid');
-                errorElement.textContent = 'Chỉ được nhập 0 hoặc 1';
-                errorElement.style.display = 'block';
-                return false;
-            }
-            
-            // If valid
-            if (/^[01]$/.test(value)) {
-                input.classList.remove('invalid');
-                input.classList.add('valid');
-                
-                // Auto move to next input
-                setTimeout(() => {
-                    moveToNextBit(input);
-                    checkAutoAnalyze();
-                }, 50);
-                
-                return true;
-            }
-            
-            return false;
-        }
-
-        function moveToNextBit(currentInput) {
-            const sequence = parseInt(currentInput.dataset.sequence);
-            const pos = parseInt(currentInput.dataset.pos);
-            
-            // If not last bit in sequence
-            if (pos < 5) {
-                const nextInput = document.querySelector(`[data-sequence="${sequence}"][data-pos="${pos + 1}"]`);
-                if (nextInput) {
-                    nextInput.focus();
-                }
-            } else {
-                // If last bit, move to next sequence
-                const nextSequence = sequence + 1;
-                const nextSeqFirstInput = document.querySelector(`[data-sequence="${nextSequence}"][data-pos="1"]`);
-                if (nextSeqFirstInput) {
-                    nextSeqFirstInput.focus();
-                } else {
-                    // If no next sequence, add new one
-                    addNewSequence();
-                }
-            }
-        }
-
-        function handleTextareaInput() {
-            const textarea = event.target;
-            const value = textarea.value;
-            const cursorPos = textarea.selectionStart;
-            
-            // Get current line up to cursor
-            const lines = value.substring(0, cursorPos).split('\n');
-            const currentLine = lines[lines.length - 1];
-            
-            // Check if current line has exactly 5 valid bits
-            if (currentLine.length === 5 && /^[01]{5}$/.test(currentLine)) {
-                // Check if we're at the end of this line
-                const remainingText = value.substring(cursorPos);
-                const nextChar = remainingText[0];
-                
-                // Only auto-newline if not already at newline
-                if (nextChar !== '\n') {
-                    setTimeout(() => {
-                        const newValue = textarea.value;
-                        const newCursorPos = textarea.selectionStart;
-                        
-                        // Insert newline at current position
-                        const beforeCursor = newValue.substring(0, newCursorPos);
-                        const afterCursor = newValue.substring(newCursorPos);
-                        textarea.value = beforeCursor + '\n' + afterCursor;
-                        
-                        // Move cursor to new line
-                        textarea.selectionStart = textarea.selectionEnd = newCursorPos + 1;
-                        textarea.focus();
-                    }, 10);
-                }
-            }
-        }
-
-        function handleBackspace(currentInput) {
-            const sequence = parseInt(currentInput.dataset.sequence);
-            const pos = parseInt(currentInput.dataset.pos);
-            
-            if (pos > 1) {
-                const prevInput = document.querySelector(`[data-sequence="${sequence}"][data-pos="${pos - 1}"]`);
-                if (prevInput) {
-                    event.preventDefault();
-                    prevInput.focus();
-                    prevInput.value = '';
-                    prevInput.classList.remove('valid', 'invalid');
-                }
-            }
-        }
-
-        function checkAutoAnalyze() {
-            const allInputs = document.querySelectorAll('.bit-input-small');
-            let filledCount = 0;
-            let validCount = 0;
-            
-            allInputs.forEach(input => {
-                if (input.value) filledCount++;
-                if (input.classList.contains('valid')) validCount++;
-            });
-            
-            // Auto analyze khi có đủ 5 dãy trở lên
-            if (validCount >= 5 && validCount === filledCount) {
-                setTimeout(() => {
-                    analyzeBitGridData();
-                }, 500);
-            }
-        }
-
-        function getSequencesFromGrid() {
-            const sequences = [];
-            const rows = document.querySelectorAll('.sequence-row');
-            
-            rows.forEach(row => {
-                const bits = row.querySelectorAll('.bit-input-small');
-                let sequence = '';
-                let isValid = true;
-                
-                bits.forEach(bit => {
-                    if (bit.value && bit.classList.contains('valid')) {
-                        sequence += bit.value;
-                    } else {
-                        isValid = false;
-                    }
-                });
-                
-                if (isValid && sequence.length === 5) {
-                    sequences.push(sequence);
-                }
-            });
-            
-            return sequences;
-        }
-
-        function analyzeBitGridData() {
-            const sequences = getSequencesFromGrid();
-            if (sequences.length < 5) {
-                document.getElementById('inputError').textContent = 'Vui lòng nhập ít nhất 5 dãy để phân tích';
-                document.getElementById('inputError').style.display = 'block';
-                return;
-            }
-            
-            historicalSequences = sequences;
-            
-            // Update textarea for consistency
-            document.getElementById('historicalData').value = sequences.join('\n');
-            
-            // Continue with normal analysis
-            performAnalysis();
-        }
-
-        function validateInput() {
-            if (currentMethod === 'bitgrid') {
-                const sequences = getSequencesFromGrid();
-                if (sequences.length < 5) {
-                    document.getElementById('inputError').textContent = 'Please enter at least 5 sequences to analyze';
-                    document.getElementById('inputError').style.display = 'block';
-                    return false;
-                }
-                return sequences;
-            } else {
-                const textarea = document.getElementById('historicalData');
-                const errorElement = document.getElementById('inputError');
-                const lines = textarea.value.trim().split('\n').filter(line => line.trim());
-                
-                // Reset error
-                errorElement.style.display = 'none';
-                errorElement.textContent = '';
-                
-                // Auto analyze when have at least 5 valid sequences
-                const validSequences = lines.filter(line => /^[01]{5}$/.test(line));
-                if (validSequences.length >= 5) {
-                    setTimeout(() => {
-                        analyzeData();
-                    }, 500);
-                }
-                
-                // Validate each sequence for error display
-                const sequences = [];
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    
-                    if (!/^[01]+$/.test(line)) {
-                        errorElement.textContent = `Dãy ${i + 1} chỉ được chứa 0 và 1`;
-                        errorElement.style.display = 'block';
-                        return false;
-                    }
-                    
-                    if (line.length !== 5) {
-                        errorElement.textContent = `Dãy ${i + 1} phải có đúng 5 bits`;
-                        errorElement.style.display = 'block';
-                        return false;
-                    }
-                    
-                    sequences.push(line);
-                }
-                
-                return sequences;
-            }
-        }
-
-        function analyzeData() {
-            const sequences = validateInput();
-            if (!sequences) return;
-            
-            historicalSequences = sequences;
-            performAnalysis();
-        }
-
-        function performAnalysis() {
-            // Calculate frequency matrix
-            frequencyMatrix = Array(5).fill(null).map(() => ({0: 0, 1: 0}));
-            
-            historicalSequences.forEach(seq => {
-                for (let i = 0; i < 5; i++) {
-                    const bit = parseInt(seq[i]);
-                    frequencyMatrix[i][bit]++;
-                }
-            });
-            
-            // Calculate pattern frequency
-            patternFrequency = {};
-            historicalSequences.forEach(seq => {
-                patternFrequency[seq] = (patternFrequency[seq] || 0) + 1;
-            });
-            
-            // Display analysis results
-            displayAnalysisResults();
-            
-            // Generate prediction
-            generatePrediction();
-        }
-
-        function displayAnalysisResults() {
-            const analysisSection = document.getElementById('analysisResults');
-            analysisSection.style.display = 'grid';
-            
-            // Display frequency table
-            const tbody = document.querySelector('#frequencyTable tbody');
-            tbody.innerHTML = '';
-            
-            for (let i = 0; i < 5; i++) {
-                const row = tbody.insertRow();
-                row.insertCell(0).textContent = `Bit ${i + 1}`;
-                
-                const zeroCell = row.insertCell(1);
-                zeroCell.textContent = frequencyMatrix[i][0];
-                zeroCell.className = 'bit-0';
-                
-                const oneCell = row.insertCell(2);
-                oneCell.textContent = frequencyMatrix[i][1];
-                oneCell.className = 'bit-1';
-                
-                const chosenBit = frequencyMatrix[i][1] > frequencyMatrix[i][0] ? '1' : '0';
-                row.insertCell(3).textContent = chosenBit;
-            }
-            
-            // Display patterns
-            const patternList = document.getElementById('patternList');
-            patternList.innerHTML = '';
-            
-            const sortedPatterns = Object.entries(patternFrequency)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10); // Top 10 patterns
-            
-            sortedPatterns.forEach(([seq, count]) => {
-                const item = document.createElement('div');
-                item.className = 'pattern-item';
-                item.innerHTML = `
-                    <span class="pattern-sequence">${seq}</span>
-                    <span class="pattern-count">${count} lần</span>
-                `;
-                patternList.appendChild(item);
-            });
-            
-            // Display statistics
-            document.getElementById('totalSequences').textContent = historicalSequences.length;
-            document.getElementById('uniqueSequences').textContent = Object.keys(patternFrequency).length;
-            
-            const mostCommonSeq = Object.entries(patternFrequency)
-                .sort((a, b) => b[1] - a[1])[0];
-            document.getElementById('mostCommon').textContent = mostCommonSeq ? mostCommonSeq[0] : '-';
-        }
-
-        function generatePrediction() {
-            let prediction = '';
-            let method = '';
-            let confidence = 0;
-            
-            // Method 1: Choose most common sequence
-            const mostCommonSeq = Object.entries(patternFrequency)
-                .sort((a, b) => b[1] - a[1])[0];
-            
-            if (mostCommonSeq && mostCommonSeq[1] >= 3) {
-                prediction = mostCommonSeq[0];
-                method = 'Dãy phổ biến';
-                confidence = (mostCommonSeq[1] / historicalSequences.length) * 100;
-            } else {
-                // Method 2: Tạo dãy tối ưu cho P(trùng ≥1 bit)
-                
-                // Tính xác suất cho mỗi bit tại mỗi vị trí
-                const bitProbabilities = [];
-                for (let i = 0; i < 5; i++) {
-                    const total = frequencyMatrix[i][0] + frequencyMatrix[i][1];
-                    bitProbabilities.push({
-                        pos: i,
-                        prob0: frequencyMatrix[i][0] / total,
-                        prob1: frequencyMatrix[i][1] / total,
-                        chosenBit: frequencyMatrix[i][1] > frequencyMatrix[i][0] ? '1' : '0'
-                    });
-                }
-                
-                // Tạo dãy dự đoán
-                for (let i = 0; i < 5; i++) {
-                    prediction += bitProbabilities[i].chosenBit;
-                }
-                
-                // Tính xác suất trùng ít nhất 1 bit
-                // P(trùng ≥1 bit) = 1 - P(không trùng cả 5 bit)
-                let probNoMatch = 1;
-                for (let i = 0; i < 5; i++) {
-                    const chosenBit = prediction[i];
-                    const oppositeBit = chosenBit === '1' ? '0' : '1';
-                    const probOpposite = chosenBit === '1' ? 
-                        bitProbabilities[i].prob0 : bitProbabilities[i].prob1;
-                    probNoMatch *= probOpposite;
-                }
-                
-                confidence = (1 - probNoMatch) * 100;
-                method = 'Tối ưu trùng bit';
-                
-                // Debug information
-                showDebugInfo(bitProbabilities, probNoMatch, confidence);
-            }
-            
-            // Display prediction
-            displayPrediction(prediction, method, confidence);
-        }
-
-        function showDebugInfo(bitProbabilities, probNoMatch, confidence) {
-            const debugInfo = document.getElementById('debugInfo');
-            const debugContent = document.getElementById('debugContent');
-            
-            debugContent.innerHTML = `
-                <strong>Bit Probabilities:</strong><br>
-                ${bitProbabilities.map((bp, i) => 
-                    `Bit ${i+1}: P(0)=${(bp.prob0*100).toFixed(1)}%, P(1)=${(bp.prob1*100).toFixed(1)}%, Chosen=${bp.chosenBit}`
-                ).join('<br>')}
-                <br><br>
-                <strong>P(không trùng cả 5 bit):</strong> ${(probNoMatch*100).toFixed(2)}%<br>
-                <strong>P(trùng ≥1 bit):</strong> ${confidence.toFixed(2)}%
-            `;
-            
-            debugInfo.style.display = 'block';
-        }
-
-        function displayPrediction(prediction, method, confidence) {
-            const predictionSection = document.getElementById('predictionSection');
-            const predictionValue = document.getElementById('predictionValue');
-            const confidenceLevel = document.getElementById('confidenceLevel');
-            const confidenceFill = document.getElementById('confidenceFill');
-            const methodUsed = document.getElementById('methodUsed');
-            const improvement = document.getElementById('improvement');
-            const expectedAccuracy = document.getElementById('expectedAccuracy');
-            
-            predictionValue.textContent = prediction;
-            confidenceLevel.textContent = `${confidence.toFixed(2)}%`;
-            confidenceFill.style.width = `${confidence}%`;
-            methodUsed.textContent = method;
-            
-            // Calculate improvement over random
-            const randomProb = 3.125; // 1/32
-            const improvementPercent = ((confidence - randomProb) / randomProb * 100).toFixed(1);
-            improvement.textContent = `${improvementPercent}%`;
-            expectedAccuracy.textContent = `${confidence.toFixed(2)}%`;
-            
-            // Show section with animation
-            predictionSection.classList.add('show');
-        }
-
-        function clearData() {
-            document.getElementById('historicalData').value = '';
-            document.getElementById('inputError').style.display = 'none';
-            document.getElementById('analysisResults').style.display = 'none';
-            document.getElementById('predictionSection').classList.remove('show');
-            document.getElementById('debugInfo').style.display = 'none';
-            document.getElementById('sequencesGrid').innerHTML = '';
-            historicalSequences = [];
-            frequencyMatrix = [];
-            patternFrequency = {};
-            sequenceCount = 0;
-        }
-
-        function loadSampleData() {
-            const sampleData = [
-                '10101', '11010', '00111', '11100', '01011',
-                '10010', '01101', '11001', '00110', '10110',
-                '01100', '10011', '01001', '10100', '11000',
-                '00101', '01010', '10111', '11011', '00100',
-                '11101', '00011', '01110', '10001', '11110'
-            ];
-            
-            document.getElementById('historicalData').value = sampleData.join('\n');
-        }
-
-        function generateAllSequences() {
-            // Tạo 9 dãy với hiệu ứng wave
+    <div class="grid">
+        <script>
             for (let i = 1; i <= 9; i++) {
-                setTimeout(() => {
-                    generateRandomSequence(i);
-                }, i * 100); // Mỗi dãy cách nhau 100ms
+                document.write(`
+                    <div class="random-box">
+                        <h4>Dãy ${i}</h4>
+                        <button onclick="generate(${i})">Tạo</button>
+                        <div id="bits${i}" class="bits"></div>
+                    </div>
+                `);
             }
-            
-            // Tự động so sánh sau khi dãy 9 tạo xong
-            setTimeout(() => {
-                autoCompareBits();
-            }, 1000);
-        }
+        </script>
+    </div>
 
-        function generateRandomSequence(boxNumber) {
-            // Tạo dãy 5 bit ngẫu nhiên
-            let randomBits = '';
-            for (let i = 0; i < 5; i++) {
-                randomBits += Math.random() < 0.5 ? '0' : '1';
-            }
-            
-            // Xóa nội dung cũ và tạo 5 ô mới
-            const bitsContainer = document.getElementById(`randomBits${boxNumber}`);
-            bitsContainer.innerHTML = '';
-            
-            for (let i = 0; i < 5; i++) {
-                const bitCell = document.createElement('div');
-                bitCell.className = 'random-bit';
-                bitCell.textContent = randomBits[i];
-                bitsContainer.appendChild(bitCell);
-            }
-            
-            // Lưu dãy vào data attribute để so sánh sau
-            bitsContainer.dataset.sequence = randomBits;
-            
-            // Nếu là hộp 3, tự động so sánh sau 500ms
-            if (boxNumber === 3) {
-                setTimeout(() => {
-                    autoCompareBits();
-                }, 500);
-            }
-            
-            // Thêm animation CSS nếu chưa có
-            if (!document.querySelector('#randomAnimation')) {
-                const style = document.createElement('style');
-                style.id = 'randomAnimation';
-                style.textContent = `
-                    @keyframes fadeInScale {
-                        from { opacity: 0; transform: scale(0.8); }
-                        to { opacity: 1; transform: scale(1); }
-                    }
-                    .random-bit {
-                        animation: fadeInScale 0.3s ease;
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
+</div>
 
-        function autoCompareBits() {
-            // Lấy 9 dãy từ 9 hộp
-            const sequences = [];
-            for (let i = 1; i <= 9; i++) {
-                const seq = document.getElementById(`randomBits${i}`).dataset.sequence;
-                if (seq) sequences.push(seq);
-            }
-            
-            // Kiểm tra xem đã tạo đủ 9 dãy chưa
-            if (sequences.length < 9) {
-                return; // Không hiển thị alert, chỉ return thầm lặng
-            }
-            
-            // Tạo dãy kết quả bằng cách đếm số lượng bit 0 và 1 ở mỗi vị trí
-            let resultSequence = '';
-            for (let i = 0; i < 5; i++) {
-                let count1 = 0, count0 = 0;
-                
-                // Đếm số lượng bit 1 và 0 ở vị trí i từ tất cả các dãy
-                for (let j = 0; j < sequences.length; j++) {
-                    const bit = sequences[j][i];
-                    if (bit === '1') count1++; else count0++;
-                }
-                
-                // Lấy bit có số lượng nhiều hơn
-                resultSequence += count1 > count0 ? '1' : '0';
-            }
-            
-            // Hiển thị kết quả
-            const resultContainer = document.getElementById('resultBits');
-            resultContainer.innerHTML = '';
-            
-            for (let i = 0; i < 5; i++) {
-                const bitCell = document.createElement('div');
-                bitCell.className = 'result-bit';
-                bitCell.textContent = resultSequence[i];
-                resultContainer.appendChild(bitCell);
-            }
-            
-            // Thêm animation cho kết quả
-            if (!document.querySelector('#resultAnimation')) {
-                const style = document.createElement('style');
-                style.id = 'resultAnimation';
-                style.textContent = `
-                    @keyframes resultPulse {
-                        0% { transform: scale(1); }
-                        50% { transform: scale(1.1); }
-                        100% { transform: scale(1); }
-                    }
-                    .result-bit {
-                        animation: resultPulse 0.5s ease;
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            // Hiển thị thông tin chi tiết
-            console.log('Các dãy:', sequences);
-            console.log('Kết quả:', resultSequence);
-        }
+<script>
+function generate(box) {
+    let seq = '';
+    const c = document.getElementById('bits' + box);
+    c.innerHTML = '';
 
-        function compareBits() {
-            // Lấy 3 dãy từ 3 hộp
-            const seq1 = document.getElementById('randomBits1').dataset.sequence;
-            const seq2 = document.getElementById('randomBits2').dataset.sequence;
-            const seq3 = document.getElementById('randomBits3').dataset.sequence;
-            
-            // Kiểm tra xem đã tạo đủ 3 dãy chưa
-            if (!seq1 || !seq2 || !seq3) {
-                alert('Vui lòng tạo đủ 3 dãy ngẫu nhiên trước khi so sánh!');
-                return;
-            }
-            
-            // Tạo dãy kết quả bằng cách đếm số lượng bit 0 và 1 ở mỗi vị trí
-            let resultSequence = '';
-            for (let i = 0; i < 5; i++) {
-                const bit1 = seq1[i];
-                const bit2 = seq2[i];
-                const bit3 = seq3[i];
-                
-                // Đếm số lượng bit 1 và 0 ở vị trí i
-                let count1 = 0, count0 = 0;
-                if (bit1 === '1') count1++; else count0++;
-                if (bit2 === '1') count1++; else count0++;
-                if (bit3 === '1') count1++; else count0++;
-                
-                // Lấy bit có số lượng nhiều hơn
-                resultSequence += count1 > count0 ? '1' : '0';
-            }
-            
-            // Hiển thị kết quả
-            const resultContainer = document.getElementById('resultBits');
-            resultContainer.innerHTML = '';
-            
-            for (let i = 0; i < 5; i++) {
-                const bitCell = document.createElement('div');
-                bitCell.className = 'result-bit';
-                bitCell.textContent = resultSequence[i];
-                resultContainer.appendChild(bitCell);
-            }
-            
-            // Thêm animation cho kết quả
-            if (!document.querySelector('#resultAnimation')) {
-                const style = document.createElement('style');
-                style.id = 'resultAnimation';
-                style.textContent = `
-                    @keyframes resultPulse {
-                        0% { transform: scale(1); }
-                        50% { transform: scale(1.1); }
-                        100% { transform: scale(1); }
-                    }
-                    .result-bit {
-                        animation: resultPulse 0.5s ease;
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-            
-            // Hiển thị thông tin chi tiết
-            console.log('Dãy 1:', seq1);
-            console.log('Dãy 2:', seq2);
-            console.log('Dãy 3:', seq3);
-            console.log('Kết quả:', resultSequence);
-        }
-    </script>
+    for (let i = 0; i < 5; i++) {
+        const b = Math.random() < 0.5 ? '0' : '1';
+        seq += b;
+
+        const d = document.createElement('div');
+        d.className = 'bit';
+        d.textContent = b;
+        c.appendChild(d);
+    }
+    c.dataset.seq = seq;
+}
+
+function generateAll() {
+    for (let i = 1; i <= 9; i++) generate(i);
+    setTimeout(compareAll, 300);
+}
+
+function compareAll() {
+    const seqs = [];
+    for (let i = 1; i <= 9; i++) {
+        const s = document.getElementById('bits' + i).dataset.seq;
+        if (!s) return;
+        seqs.push(s);
+    }
+
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+        let ones = 0;
+        seqs.forEach(s => s[i] === '1' && ones++);
+        result += ones >= 5 ? '1' : '0';
+    }
+
+    const out = document.getElementById('resultBits');
+    out.innerHTML = '';
+    for (const b of result) {
+        const d = document.createElement('div');
+        d.className = 'result-bit';
+        d.textContent = b;
+        out.appendChild(d);
+    }
+}
+</script>
+
 </body>
 </html>
+
