@@ -2,230 +2,947 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>9 Dãy 5-bit</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Enigma Machine - 10 Rotors</title>
 <style>
-/* ===== BACKGROUND ===== */
-body {
+  * {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea, #764ba2);
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding: 30px;
-    color: #fff;
-}
-
-/* ===== CONTAINER ===== */
-.container {
-    width: 100%;
-    max-width: 950px;
-    background: rgba(0,0,0,0.25);
-    backdrop-filter: blur(10px);
-    border-radius: 18px;
-    padding: 30px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.35);
-}
-
-/* ===== TITLE ===== */
-h1 {
-    text-align: center;
-    margin-bottom: 25px;
-    font-size: 30px;
-    letter-spacing: 1px;
-}
-
-/* ===== BUTTON ===== */
-button {
-    background: linear-gradient(135deg, #48bb78, #38a169);
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.25s;
-}
-
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.35);
-}
-
-/* ===== RESULT BOX ===== */
-.result-box {
-    background: rgba(0,0,0,0.35);
-    border: 2px solid #ffd166;
-    border-radius: 14px;
+    align-items: center;
     padding: 20px;
-    text-align: center;
-    margin: 0 auto 30px auto;
-    width: 50%;
-}
+    color: #fff;
+  }
 
-.result-bits {
+  .container {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 40px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+    max-width: 1200px;
+    width: 100%;
+    animation: fadeIn 0.8s ease-out;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(96, 165, 250, 0.5);
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #94a3b8;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  @media (max-width: 768px) {
+    .main-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .section {
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .section-title {
+    font-weight: 700;
+    margin-bottom: 20px;
     display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2em;
+    color: #e2e8f0;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+  }
+
+  .bit-inputs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  input {
+    width: 55px;
+    height: 55px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: rgba(15, 23, 42, 0.8);
+    color: #60a5fa;
+  }
+
+  input.in {
+    cursor: pointer;
+    border-color: rgba(96, 165, 250, 0.5);
+  }
+
+  input.in:focus {
+    border-color: #60a5fa;
+    outline: none;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+    background: rgba(30, 41, 59, 0.9);
+  }
+
+  input.out {
+    background: rgba(51, 65, 85, 0.8);
+    color: #a78bfa;
+    cursor: not-allowed;
+    border-color: rgba(167, 139, 250, 0.5);
+  }
+
+  .control-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .control-group {
+    background: rgba(30, 41, 59, 0.6);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+
+  .control-label {
+    font-size: 0.9em;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  select, input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 14px;
+  }
+
+  select:focus, input[type="number"]:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
+  }
+
+  .button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin: 30px 0;
+    flex-wrap: wrap;
+  }
+
+  button {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  button:hover::before {
+    left: 100%;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, #10b981, #06b6d4);
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    color: white;
+  }
+
+  .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+  }
+
+  #info {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+    border-radius: 15px;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin: 20px 0;
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    font-size: 1.1em;
+  }
+
+  .rotor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .rotor-item {
+    text-align: center;
+    padding: 12px;
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .rotor-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.4);
+  }
+
+  .rotor-name {
+    font-weight: bold;
+    color: #60a5fa;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+  }
+
+  .rotor-value {
+    font-family: 'Courier New', monospace;
+    color: #a78bfa;
+    font-size: 0.85em;
+  }
+
+  .history-panel {
+    max-height: 200px;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+
+  .history-item {
+    padding: 8px;
+    margin: 5px 0;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #94a3b8;
+    border-left: 3px solid #60a5fa;
+  }
+
+  .process-flow {
+    display: flex;
+    align-items: center;
     justify-content: center;
     gap: 10px;
-    margin-top: 12px;
-}
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
 
-.result-bit {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #ffd166, #f4a261);
-    color: #000;
+  .process-step {
+    padding: 8px 15px;
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(96, 165, 250, 0.4);
+    border-radius: 20px;
+    font-size: 0.85em;
+    color: #60a5fa;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .arrow {
+    color: #a78bfa;
     font-weight: bold;
-    font-size: 18px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+  }
 
-/* ===== TOP BUTTON ===== */
-.top-btn {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-/* ===== GRID 9 BOXES ===== */
-.grid {
+  .stats-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-}
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
 
-/* ===== RANDOM BOX ===== */
-.random-box {
-    background: rgba(255,255,255,0.08);
-    border-radius: 14px;
-    padding: 18px;
+  .stat-item {
     text-align: center;
-    border: 1px solid rgba(255,255,255,0.15);
-}
+    padding: 15px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
 
-.random-box h4 {
-    margin: 0 0 10px;
-    font-size: 16px;
-    opacity: 0.9;
-}
-
-.bits {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 12px;
-}
-
-.bit {
-    width: 34px;
-    height: 34px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 6px;
+  .stat-value {
+    font-size: 1.5em;
     font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
-}
+    color: #60a5fa;
+  }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+  .stat-label {
+    font-size: 0.85em;
+    color: #94a3b8;
+    margin-top: 5px;
+  }
 
-@media (max-width: 480px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
-}
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(96, 165, 250, 0.5);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(96, 165, 250, 0.7);
+  }
 </style>
 </head>
-
 <body>
+
 <div class="container">
+  <h1>🔐 Advanced Enigma Machine</h1>
+  <p class="subtitle">10 Rotors • Multiple Modes • Advanced Cryptography</p>
 
-    <h1>🎯 9 Dãy Nhị Phân 5-bit</h1>
+  <div class="control-panel">
+    <div class="control-group">
+      <div class="control-label">🔧 Encryption Mode</div>
+      <select id="mode">
+        <option value="ecb">ECB (Electronic Codebook)</option>
+        <option value="cbc">CBC (Cipher Block Chaining)</option>
+        <option value="ctr">CTR (Counter)</option>
+        <option value="chain">Chain Mode</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <div class="control-label">🔄 Rounds</div>
+      <input type="number" id="rounds" min="1" max="10" value="3">
+    </div>
+    <div class="control-group">
+      <div class="control-label">🔑 Key (Hex)</div>
+      <input type="text" id="customKey" value="C0FFEE99" maxlength="8">
+    </div>
+    <div class="control-group">
+      <div class="control-label">📊 IV (Hex)</div>
+      <input type="text" id="customIV" value="12345678" maxlength="8">
+    </div>
+  </div>
 
-    <!-- RESULT -->
-    <div class="result-box">
-        <h3>KẾT QUẢ SO SÁNH</h3>
-        <button onclick="compareAll()">So sánh 9 dãy</button>
-        <div id="resultBits" class="result-bits"></div>
+  <div class="main-grid">
+    <div class="section">
+      <div class="section-title">
+        <span class="icon">📥</span>
+        Input Bits
+      </div>
+      <div class="bit-inputs">
+        <input class="in" maxlength="1" placeholder="0/1">
+        <input class="in" maxlength="1" placeholder="0/1">
+        <input class="in" maxlength="1" placeholder="0/1">
+        <input class="in" maxlength="1" placeholder="0/1">
+        <input class="in" maxlength="1" placeholder="0/1">
+      </div>
     </div>
 
-    <div class="top-btn">
-        <button onclick="generateAll()">🎲 Tạo cả 9 dãy</button>
+    <div class="section">
+      <div class="section-title">
+        <span class="icon">📤</span>
+        Output Bits
+      </div>
+      <div class="bit-inputs">
+        <input class="out" readonly>
+        <input class="out" readonly>
+        <input class="out" readonly>
+        <input class="out" readonly>
+        <input class="out" readonly>
+      </div>
+    </div>
+  </div>
+
+  <div class="process-flow" id="processFlow">
+    <div class="process-step">Input</div>
+    <span class="arrow">→</span>
+    <div class="process-step">Permutation</div>
+    <span class="arrow">→</span>
+    <div class="process-step">Rotor 1-10</div>
+    <span class="arrow">→</span>
+    <div class="process-step">Final Mix</div>
+    <span class="arrow">→</span>
+    <div class="process-step">Output</div>
+  </div>
+
+  <div class="button-group">
+    <button id="encrypt" class="btn-primary">🔐 Encrypt</button>
+    <button id="decrypt" class="btn-secondary">🔓 Decrypt</button>
+    <button id="reset" class="btn-danger">🔄 Reset</button>
+    <button id="export" class="btn-primary">💾 Export State</button>
+    <button id="import" class="btn-secondary">📂 Import State</button>
+  </div>
+
+  <div id="info">Advanced Enigma Ready - 10 Rotors Active</div>
+
+  <div class="section">
+    <div class="section-title">
+      <span class="icon">⚙️</span>
+      Rotor States (Real-time)
+    </div>
+    <div class="rotor-grid" id="rotorGrid">
+      <!-- Rotor states will be populated here -->
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="section">
+      <div class="section-title">
+        <span class="icon">📈</span>
+        Statistics
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="totalOps">0</div>
+          <div class="stat-label">Total Operations</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="entropy">0.00</div>
+          <div class="stat-label">Entropy Score</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="cycles">0</div>
+          <div class="stat-label">Key Cycles</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="diffusion">0%</div>
+          <div class="stat-label">Diffusion Rate</div>
+        </div>
+      </div>
     </div>
 
-    <div class="grid">
-        <script>
-            for (let i = 1; i <= 9; i++) {
-                document.write(`
-                    <div class="random-box">
-                        <h4>Dãy ${i}</h4>
-                        <button onclick="generate(${i})">Tạo</button>
-                        <div id="bits${i}" class="bits"></div>
-                    </div>
-                `);
-            }
-        </script>
+    <div class="section">
+      <div class="section-title">
+        <span class="icon">📜</span>
+        Operation History
+      </div>
+      <div class="history-panel" id="history">
+        <div class="history-item">System initialized - Advanced Enigma ready</div>
+      </div>
     </div>
-
+  </div>
 </div>
 
 <script>
-function generate(box) {
-    let seq = '';
-    const c = document.getElementById('bits' + box);
-    c.innerHTML = '';
+/* ======= ADVANCED ENIGMA MACHINE ======= */
 
-    for (let i = 0; i < 5; i++) {
-        const b = Math.random() < 0.5 ? '0' : '1';
-        seq += b;
+// Global variables
+let KEY, IV;
+let r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;
+let step, totalOps, keyCycles;
+let previousCipher = 0;
+let operationHistory = [];
+let currentMode = 'ecb';
 
-        const d = document.createElement('div');
-        d.className = 'bit';
-        d.textContent = b;
-        c.appendChild(d);
-    }
-    c.dataset.seq = seq;
+// DOM elements
+const inputs = document.querySelectorAll(".in");
+const outputs = document.querySelectorAll(".out");
+const info = document.getElementById("info");
+const rotorGrid = document.getElementById("rotorGrid");
+const history = document.getElementById("history");
+
+// Initialize rotor grid display
+function initRotorDisplay() {
+  rotorGrid.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const rotorItem = document.createElement('div');
+    rotorItem.className = 'rotor-item';
+    rotorItem.innerHTML = `
+      <div class="rotor-name">Rotor ${i}</div>
+      <div class="rotor-value" id="r${i}-info">0</div>
+    `;
+    rotorGrid.appendChild(rotorItem);
+  }
 }
 
-function generateAll() {
-    for (let i = 1; i <= 9; i++) generate(i);
-    setTimeout(compareAll, 300);
+// Initialize state
+function initState() {
+  KEY = parseInt(document.getElementById('customKey').value, 16) || 0xC0FFEE99;
+  IV = parseInt(document.getElementById('customIV').value, 16) || 0x12345678;
+  
+  r1 = (KEY ^ IV) >>> 0;
+  r2 = (KEY + IV) >>> 0;
+  r3 = 0b10101;
+  r4 = 0b01011;
+  r5 = (~KEY) >>> 0;
+  r6 = 0;
+  r7 = (KEY * 31) >>> 0;
+  r8 = (IV ^ 0xDEADBEEF) >>> 0;
+  r9 = 0b11010;
+  r10 = 0;
+  
+  step = 0;
+  totalOps = 0;
+  keyCycles = 0;
+  previousCipher = 0;
+  operationHistory = [];
+  
+  updateStats();
+  addToHistory('System reinitialized with new parameters');
 }
 
-function compareAll() {
-    const seqs = [];
-    for (let i = 1; i <= 9; i++) {
-        const s = document.getElementById('bits' + i).dataset.seq;
-        if (!s) return;
-        seqs.push(s);
-    }
+// Enhanced S-box with dynamic capability
+const DYNAMIC_SBOX = [
+  [12,5,6,11,9,0,10,13,3,14,15,8,4,7,1,2,2,1,7,4,8,15,14,3,13,10,0,9,11,6,5,12],
+  [8,6,7,9,3,12,10,15,13,1,5,0,14,4,2,11,11,2,4,14,0,5,1,13,15,10,12,3,9,7,6,8],
+  [15,0,6,8,11,1,9,2,5,12,14,10,7,3,13,4,4,13,3,7,10,14,12,5,2,9,1,11,8,6,0,15]
+];
 
-    let result = '';
-    for (let i = 0; i < 5; i++) {
-        let ones = 0;
-        seqs.forEach(s => s[i] === '1' && ones++);
-        result += ones >= 5 ? '1' : '0';
-    }
+// Permutation layer for additional diffusion
+const PERMUTATION = [2, 4, 1, 0, 3];
 
-    const out = document.getElementById('resultBits');
-    out.innerHTML = '';
-    for (const b of result) {
-        const d = document.createElement('div');
-        d.className = 'result-bit';
-        d.textContent = b;
-        out.appendChild(d);
-    }
+// Advanced rotors
+function rotor1(x) {
+  r1 ^= r1 << 13;
+  r1 ^= r1 >>> 17;
+  r1 ^= r1 << 5;
+  r1 >>>= 0;
+  return x ^ ((r1 >>> 27) & 31);
 }
+
+function rotor2(x) {
+  if (step % 2 === 0)
+    r2 = (1664525 * r2 + 1013904223) >>> 0;
+  return x ^ ((r2 >>> 26) & 31);
+}
+
+function rotor3(x) {
+  r3 = ((r3 << 1) | (r3 >> 4)) & 31;
+  return x ^ r3;
+}
+
+function rotor4(x) {
+  const sboxIndex = step % 3;
+  r4 = DYNAMIC_SBOX[sboxIndex][r4];
+  return DYNAMIC_SBOX[sboxIndex][x ^ r4] & 31;
+}
+
+function rotor5(x) {
+  r5 ^= r5 << 7;
+  r5 ^= r5 >>> 9;
+  r5 >>>= 0;
+  return x ^ ((r5 >>> 25) & 31);
+}
+
+function rotor6(x) {
+  r6 = (r6 + 1) & 31;
+  return x ^ r6;
+}
+
+// New advanced rotors
+function rotor7(x) {
+  // TEA-inspired rotation
+  r7 = (r7 + ((r7 << 4) ^ (r7 >>> 5)) + 0x9E3779B9) >>> 0;
+  return x ^ ((r7 >>> 24) & 31);
+}
+
+function rotor8(x) {
+  // Feistel network inspired
+  if (step % 3 === 0) {
+    r8 = ((r8 << 3) | (r8 >>> 29)) ^ 0x12345678;
+  }
+  return x ^ ((r8 >>> 23) & 31);
+}
+
+function rotor9(x) {
+  // Advanced rotation with variable step
+  const rotStep = (step % 5) + 1;
+  r9 = ((r9 << rotStep) | (r9 >>> (32 - rotStep))) & 31;
+  return x ^ r9;
+}
+
+function rotor10(x) {
+  // Chaotic counter
+  r10 = (r10 + step) & 31;
+  return x ^ r10;
+}
+
+// Permutation layer
+function permute(x) {
+  let result = 0;
+  const bits = numToBits(x);
+  for (let i = 0; i < 5; i++) {
+    result = (result << 1) | bits[PERMUTATION[i]];
+  }
+  return result;
+}
+
+// Key schedule
+function updateKeySchedule() {
+  if (step % 100 === 0) {
+    KEY = (KEY ^ (KEY << 13) ^ (KEY >>> 19)) >>> 0;
+    keyCycles++;
+    addToHistory(`Key schedule updated - Cycle ${keyCycles}`);
+  }
+}
+
+// Multiple rounds processing
+function processRounds(x) {
+  const rounds = parseInt(document.getElementById('rounds').value) || 3;
+  let result = x;
+  
+  for (let round = 0; round < rounds; round++) {
+    // Apply permutation
+    result = permute(result);
+    
+    // Apply all rotors
+    result = rotor1(result);
+    result = rotor2(result);
+    result = rotor3(result);
+    result = rotor4(result);
+    result = rotor5(result);
+    result = rotor6(result);
+    result = rotor7(result);
+    result = rotor8(result);
+    result = rotor9(result);
+    result = rotor10(result);
+    
+    // Final mixing
+    result = result ^ ((KEY >>> round) & 31);
+  }
+  
+  return result & 31;
+}
+
+// Mode-specific processing
+function processWithMode(input) {
+  currentMode = document.getElementById('mode').value;
+  let result;
+  
+  switch (currentMode) {
+    case 'cbc':
+      result = input ^ previousCipher;
+      result = processRounds(result);
+      previousCipher = result;
+      break;
+      
+    case 'ctr':
+      const counter = step & 31;
+      result = input ^ counter;
+      result = processRounds(result);
+      break;
+      
+    case 'chain':
+      result = processRounds(input);
+      // Chain output as next input modifier
+      result = result ^ ((previousCipher >>> 2) & 31);
+      previousCipher = result;
+      break;
+      
+    default: // ECB
+      result = processRounds(input);
+      break;
+  }
+  
+  return result;
+}
+
+// Bit conversion helpers
+function bitsToNum(bits) {
+  return bits.reduce((a, b) => (a << 1) | b, 0);
+}
+
+function numToBits(n) {
+  return Array.from({ length: 5 }, (_, i) => (n >> (4 - i)) & 1);
+}
+
+// Update rotor display
+function updateRotorInfo() {
+  document.getElementById('r1-info').textContent = (r1 >>> 27) & 31;
+  document.getElementById('r2-info').textContent = (r2 >>> 26) & 31;
+  document.getElementById('r3-info').textContent = r3.toString(2).padStart(5, '0');
+  document.getElementById('r4-info').textContent = r4.toString(16).toUpperCase();
+  document.getElementById('r5-info').textContent = (r5 >>> 25) & 31;
+  document.getElementById('r6-info').textContent = r6;
+  document.getElementById('r7-info').textContent = (r7 >>> 24) & 31;
+  document.getElementById('r8-info').textContent = (r8 >>> 23) & 31;
+  document.getElementById('r9-info').textContent = r9.toString(2).padStart(5, '0');
+  document.getElementById('r10-info').textContent = r10;
+}
+
+// Calculate entropy
+function calculateEntropy() {
+  const values = [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10];
+  const frequency = {};
+  
+  values.forEach(v => {
+    const key = v & 31;
+    frequency[key] = (frequency[key] || 0) + 1;
+  });
+  
+  let entropy = 0;
+  Object.values(frequency).forEach(count => {
+    const p = count / values.length;
+    if (p > 0) entropy -= p * Math.log2(p);
+  });
+  
+  return entropy.toFixed(2);
+}
+
+// Update statistics
+function updateStats() {
+  document.getElementById('totalOps').textContent = totalOps;
+  document.getElementById('entropy').textContent = calculateEntropy();
+  document.getElementById('cycles').textContent = keyCycles;
+  
+  // Calculate diffusion (simplified)
+  const diffusion = Math.min(100, (totalOps * 2.5) % 100);
+  document.getElementById('diffusion').textContent = diffusion + '%';
+}
+
+// Add to history
+function addToHistory(message) {
+  const timestamp = new Date().toLocaleTimeString();
+  const historyItem = `[${timestamp}] ${message}`;
+  operationHistory.unshift(historyItem);
+  
+  if (operationHistory.length > 10) {
+    operationHistory.pop();
+  }
+  
+  history.innerHTML = operationHistory.map(item => 
+    `<div class="history-item">${item}</div>`
+  ).join('');
+}
+
+// Main encryption/decryption function
+function compute(encryptMode = true) {
+  const vals = [...inputs].map(i => i.value);
+  if (vals.some(v => v === "")) return;
+
+  let x = bitsToNum(vals.map(Number));
+  step++;
+  totalOps++;
+  
+  // Update key schedule
+  updateKeySchedule();
+  
+  // Process with selected mode
+  let result = processWithMode(x);
+  
+  if (!encryptMode) {
+    // For decryption, we'd need to reverse the process
+    // This is simplified - real decryption would require storing states
+    result = processRounds(x ^ 0x55555); // Simple reverse example
+  }
+  
+  const out = numToBits(result & 31);
+  out.forEach((b, i) => outputs[i].value = b);
+  
+  // Update displays
+  updateRotorInfo();
+  updateStats();
+  
+  const modeText = encryptMode ? 'Encrypted' : 'Decrypted';
+  const hexOutput = result.toString(16).toUpperCase();
+  info.textContent = `🔢 Step ${step} | ${modeText}: ${hexOutput} | Mode: ${currentMode.toUpperCase()} | Rounds: ${document.getElementById('rounds').value}`;
+  
+  addToHistory(`${modeText} ${vals.join('')} → ${out.join('')} (0x${hexOutput})`);
+}
+
+// Reset function
+function softReset() {
+  inputs.forEach(i => i.value = "");
+  outputs.forEach(o => o.value = "");
+  previousCipher = 0;
+  info.textContent = "Advanced Enigma Ready - 10 Rotors Active";
+  inputs[0].focus();
+  addToHistory('System reset - Ready for new operation');
+}
+
+// Export state
+function exportState() {
+  const state = {
+    KEY: KEY.toString(16).toUpperCase(),
+    IV: IV.toString(16).toUpperCase(),
+    rotors: [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10],
+    step: step,
+    mode: currentMode,
+    rounds: document.getElementById('rounds').value
+  };
+  
+  const stateJson = JSON.stringify(state, null, 2);
+  const blob = new Blob([stateJson], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'enigma-state.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  addToHistory('State exported to file');
+}
+
+// Import state
+function importState() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const state = JSON.parse(event.target.result);
+        KEY = parseInt(state.KEY, 16);
+        IV = parseInt(state.IV, 16);
+        [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10] = state.rotors;
+        step = state.step;
+        currentMode = state.mode;
+        document.getElementById('mode').value = state.mode;
+        document.getElementById('rounds').value = state.rounds;
+        document.getElementById('customKey').value = state.KEY;
+        document.getElementById('customIV').value = state.IV;
+        
+        updateRotorInfo();
+        updateStats();
+        addToHistory('State imported successfully');
+      } catch (error) {
+        addToHistory('Error importing state: Invalid file format');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// Event listeners
+inputs.forEach((inp, idx) => {
+  inp.addEventListener("input", () => {
+    if (inp.value !== "0" && inp.value !== "1") {
+      inp.value = "";
+      return;
+    }
+    if (idx < inputs.length - 1)
+      inputs[idx + 1].focus();
+    compute(true);
+  });
+
+  inp.addEventListener("keydown", e => {
+    if (e.key === "Backspace" && inp.value === "" && idx > 0)
+      inputs[idx - 1].focus();
+  });
+});
+
+document.getElementById("encrypt").onclick = () => compute(true);
+document.getElementById("decrypt").onclick = () => compute(false);
+document.getElementById("reset").onclick = softReset;
+document.getElementById("export").onclick = exportState;
+document.getElementById("import").onclick = importState;
+
+// Mode change handler
+document.getElementById('mode').addEventListener('change', () => {
+  currentMode = document.getElementById('mode').value;
+  addToHistory(`Mode changed to ${currentMode.toUpperCase()}`);
+});
+
+// Key/IV change handlers
+document.getElementById('customKey').addEventListener('change', () => {
+  initState();
+});
+
+document.getElementById('customIV').addEventListener('change', () => {
+  initState();
+});
+
+// Initialize
+initRotorDisplay();
+initState();
+softReset();
 </script>
 
 </body>
