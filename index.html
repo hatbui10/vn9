@@ -754,14 +754,14 @@
       Tổng Vốn Hiện Tại
     </div>
     <div class="capital-controls">
+      <div class="capital-input-group">
+        <input type="number" id="initialCapital" value="10.000.000" min="1000" step="1000" placeholder="Vốn ban đầu">
+        <button id="startBetting" class="btn-primary play-pulse">🎮 Play</button>
+      </div>
       <div class="capital-displays">
         <div>
-          <div class="display-label">Vốn Ban Đầu</div>
-          <input type="number" id="initialCapital" value="10.000.000" min="1000" step="1000" placeholder="Vốn ban đầu">
-        </div>
-        <div>
           <div class="display-label">Vốn Hiện Tại</div>
-          <input type="number" id="currentCapitalInput" value="10.000.000" min="0" readonly class="capital-input-display">
+          <div class="capital-display" id="currentCapital">10.000.000</div>
         </div>
         <div>
           <div class="display-label">Lãi/Lỗ Round</div>
