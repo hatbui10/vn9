@@ -503,6 +503,7 @@
     #startBetting {
       width: 100%;
       max-width: 200px;
+      margin-bottom: 35px;
     }
   }
 
@@ -615,6 +616,7 @@
     align-items: center;
     justify-content: center;
     flex-wrap: nowrap;
+    margin-bottom: 20px;
   }
 
   .multiplier-input {
@@ -635,6 +637,10 @@
     outline: none;
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+  }
+
+  #startBetting {
+    margin-bottom: 35px;
   }
 
   .x1000-display {
@@ -836,7 +842,7 @@
     <div class="capital-controls">
       <div class="capital-input-group">
         <input type="number" id="initialCapital" value="10.000.000" min="1000" step="1000" placeholder="Vốn ban đầu">
-        <button id="startBetting" class="btn-primary play-pulse">🎮 Play</button>
+        
       </div>
       <div class="capital-displays">
         <div>
@@ -854,6 +860,21 @@
   <!-- Input and Betting Section -->
   <div class="main-grid">
     <div class="section">
+    
+     <div class="section-title" style="margin: 20px;">
+        <span class="icon">🎲</span>
+        Mức Cược (x1000)
+      </div>
+      <div class="multiplier-inputs">
+        <input type="number" class="multiplier-input" id="mult1" value="2" min="1" max="100" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult2" value="4" min="1" max="100" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult3" value="8" min="1" max="100" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult4" value="16" min="1" max="100" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult5" value="32" min="1" max="100" inputmode="numeric">
+      </div>
+   
+<button id="startBetting" class="btn-primary play-pulse">🎮 Play</button>
+        
       <div class="section-title">
         <span class="icon">📥</span>
         Input Bits & Mức Cược
@@ -866,20 +887,9 @@
         <input class="in" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
         <input class="in" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
       </div>
-      
-      <div class="section-title" style="margin-top: 20px;">
-        <span class="icon">🎲</span>
-        Mức Cược (x1000)
-      </div>
-      <div class="multiplier-inputs">
-        <input type="number" class="multiplier-input" id="mult1" value="2" min="1" max="100" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult2" value="4" min="1" max="100" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult3" value="8" min="1" max="100" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult4" value="16" min="1" max="100" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult5" value="32" min="1" max="100" inputmode="numeric">
-      </div>
-    </div>
+       </div>
 
+     
     <div class="section">
       <div class="section-title">
         <span class="icon">📤</span>
@@ -1887,6 +1897,7 @@ inputs[0].focus();
 
 </body>
 </html>
+
 
 
 
