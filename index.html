@@ -310,6 +310,61 @@
     transform: translateZ(0);
   }
 
+  /* Ẩn các hộp không cần thiết */
+  .control-panel {
+    display: none !important;
+  }
+  
+  .process-flow {
+    display: none !important;
+  }
+  
+  .button-group {
+    display: none !important;
+  }
+  
+  #info {
+    display: none !important;
+  }
+  
+  .section:not(.capital-section):not(.game-info-section) {
+    display: none !important;
+  }
+  
+  /* Ẩn thêm statistics và operation history */
+  .section:has(.stat-item),
+  .section:has(#history),
+  .section:has(.stats-grid),
+  .section:has(.history-panel) {
+    display: none !important;
+  }
+  
+  /* Ẩn rotor states */
+  .section:has(.rotor-grid) {
+    display: none !important;
+  }
+  
+  /* Chỉ hiển thị 4 hộp chính */
+  .capital-section,
+  .game-info-section,
+  .main-grid .section:nth-child(1),
+  .main-grid .section:nth-child(2) {
+    display: block !important;
+  }
+  
+  /* Căn giữa 4 hộp chính */
+  .main-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .capital-section {
+    grid-column: 1 / -1;
+    margin-bottom: 20px;
+  }
+
   @keyframes betPromptPulse {
     0%, 100% { 
       opacity: 1;
