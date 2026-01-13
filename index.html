@@ -303,6 +303,32 @@
     }
   }
 
+  .bet-prompt {
+    animation: betPromptPulse 1s ease-in-out infinite;
+    will-change: transform, opacity, filter;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  @keyframes betPromptPulse {
+    0%, 100% { 
+      opacity: 1;
+      transform: scale(1) translateY(0) translateZ(0);
+      text-shadow: 0 0 15px rgba(255, 0, 100, 1), 0 0 30px rgba(255, 0, 100, 0.8);
+      filter: brightness(1.2) saturate(1.5);
+      color: #ff0064;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.6);
+    }
+    50% { 
+      opacity: 0.8;
+      transform: scale(1.1) translateY(-4px) translateZ(0);
+      text-shadow: 0 0 25px rgba(255, 0, 100, 1), 0 0 50px rgba(255, 0, 100, 0.8);
+      filter: brightness(1.6) saturate(2);
+      color: #ff0064;
+      box-shadow: 0 12px 40px rgba(245, 158, 11, 0.9);
+    }
+  }
+
   .btn-secondary {
     background: linear-gradient(135deg, #10b981, #06b6d4);
     color: white;
@@ -800,6 +826,19 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(96, 165, 250, 0.7);
   }
+
+  /* Xóa mũi tên trong ô input type="number */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+  
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
 </style>
 </head>
 <body>
@@ -841,13 +880,13 @@
     </div>
     <div class="capital-controls">
       <div class="capital-input-group">
-        <input type="number" id="initialCapital" value="10.000.000" min="1000" step="1000" placeholder="Vốn ban đầu">
-        
+        <input type="text" id="initialCapital" placeholder="Nhập vốn ban đầu">
+        <button id="setCapital" class="btn-secondary">💰 Nhập Vốn</button>
       </div>
       <div class="capital-displays">
         <div>
           <div class="display-label">Vốn Hiện Tại</div>
-          <div class="capital-display" id="currentCapital">10.000.000</div>
+          <div class="capital-display" id="currentCapital">0</div>
         </div>
         <div>
           <div class="display-label">Lãi/Lỗ Round</div>
@@ -866,11 +905,11 @@
         Mức Cược (x1000)
       </div>
       <div class="multiplier-inputs">
-        <input type="number" class="multiplier-input" id="mult1" value="2" min="1" max="100" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult2" value="4" min="1" max="100" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult3" value="8" min="1" max="100" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult4" value="16" min="1" max="100" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult5" value="32" min="1" max="100" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult1" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult2" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult3" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult4" inputmode="numeric">
+        <input type="number" class="multiplier-input" id="mult5" inputmode="numeric">
       </div>
    
 <button id="startBetting" class="btn-primary play-pulse">🎮 Play</button>
@@ -947,7 +986,7 @@
   </div>
 
   <div class="button-group">
-    <button id="encrypt" class="btn-primary">🔐 Encrypt</button>
+       <button id="encrypt" class="btn-primary">🔐 Encrypt</button>
     <button id="decrypt" class="btn-secondary">🔓 Decrypt</button>
     <button id="reset" class="btn-danger">🔄 Reset</button>
     <button id="export" class="btn-primary">💾 Export State</button>
@@ -1016,8 +1055,8 @@ let operationHistory = [];
 let currentMode = 'ecb';
 
 // Betting system variables
-let currentCapital = 10000000;
-let initialCapital = 10000000;
+let currentCapital = 0;
+let initialCapital = 0;
 let bettingActive = false;
 let bettingHistory = [];
 let currentBetRound = 0;
@@ -1038,6 +1077,7 @@ const initialCapitalInput = document.getElementById("initialCapital");
 const currentCapitalDisplay = document.getElementById("currentCapital");
 const profitDisplay = document.getElementById("profitDisplay");
 const startBettingBtn = document.getElementById("startBetting");
+const setCapitalBtn = document.getElementById("setCapital");
 const gameStatusDisplay = document.getElementById("gameStatus");
 const bettingHistoryPanel = document.getElementById("bettingHistory");
 const multiplierInputs = document.querySelectorAll(".multiplier-input");
@@ -1392,6 +1432,85 @@ function addToBettingHistory(message, isWin = null) {
   }
 }
 
+function setCapital() {
+  // Parse giá trị từ input, loại bỏ dấu chấm và dấu phẩy
+  const capitalValue = parseInt(initialCapitalInput.value.replace(/[.,]/g, '')) || 10000000;
+  
+  if (capitalValue < 1000) {
+    gameStatusDisplay.textContent = '⚠️ Vốn tối thiểu là 1,000';
+    gameStatusDisplay.classList.add('warning');
+    setTimeout(() => {
+      gameStatusDisplay.classList.remove('warning');
+      gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
+      gameStatusDisplay.classList.add('play-prompt');
+    }, 3000);
+    return;
+  }
+  
+  // Cho phép tăng vốn cả khi đang chơi và khi chưa chơi
+  if (!bettingActive) {
+    // Chưa chơi - cập nhật vốn ban đầu và vốn hiện tại
+    initialCapital = capitalValue;
+    currentCapital = capitalValue;
+    roundProfit = 0; // Reset lãi round
+    updateCapitalDisplay();
+    
+    // Hiển thị thông báo thành công
+    gameStatusDisplay.textContent = `💰 Đã nhập vốn: ${formatCurrencyWithSeparator(capitalValue)} - Vui lòng nhập mức cược`;
+    gameStatusDisplay.classList.remove('warning');
+    gameStatusDisplay.classList.add('bet-prompt');
+    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
+    gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
+    gameStatusDisplay.style.color = '#f59e0b';
+    
+    addToBettingHistory(`Nhập vốn: ${formatCurrencyWithSeparator(capitalValue)}`);
+    addToHistory(`Capital set to: ${formatCurrencyWithSeparator(capitalValue)}`);
+    
+    // Focus ngay lập tức vào ô mức cược đầu tiên
+    document.getElementById('mult1').focus();
+  } else {
+    // Đang chơi - chỉ tăng vốn hiện tại, không thay đổi vốn ban đầu
+    if (capitalValue > currentCapital) {
+      const capitalIncrease = capitalValue - currentCapital;
+      currentCapital = capitalValue;
+      updateCapitalDisplay();
+      
+      // Hiển thị thông báo tăng vốn thành công
+      gameStatusDisplay.textContent = `💰 Đã tăng vốn: +${formatCurrencyWithSeparator(capitalIncrease)} - Vui lòng nhập mức cược`;
+      gameStatusDisplay.classList.remove('warning');
+      gameStatusDisplay.classList.add('bet-prompt');
+      gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
+      gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
+      gameStatusDisplay.style.color = '#f59e0b';
+      
+      addToBettingHistory(`Tăng vốn: +${formatCurrencyWithSeparator(capitalIncrease)} - Vốn mới: ${formatCurrencyWithSeparator(currentCapital)}`);
+      addToHistory(`Capital increased by: ${formatCurrencyWithSeparator(capitalIncrease)}`);
+      
+      // Focus ngay lập tức vào ô input mức cược đầu tiên
+      document.getElementById('mult1').focus();
+    } else if (capitalValue < currentCapital) {
+      // Không cho phép giảm vốn khi đang chơi
+      gameStatusDisplay.textContent = '⚠️ Không thể giảm vốn khi đang chơi! Chỉ có thể tăng vốn.';
+      gameStatusDisplay.classList.add('warning');
+      setTimeout(() => {
+        gameStatusDisplay.classList.remove('warning');
+        gameStatusDisplay.textContent = '🎮 Đang chơi - Nhập 5 bit để bắt đầu';
+      }, 3000);
+    } else {
+      // Vốn không đổi
+      gameStatusDisplay.textContent = '💰 Vốn không thay đổi - Vui lòng nhập mức cược';
+      gameStatusDisplay.classList.remove('warning');
+      gameStatusDisplay.classList.add('bet-prompt');
+      gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
+      gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
+      gameStatusDisplay.style.color = '#f59e0b';
+      
+      // Focus ngay lập tức vào ô input mức cược đầu tiên
+      document.getElementById('mult1').focus();
+    }
+  }
+}
+
 function startBetting() {
   // Parse giá trị từ input, loại bỏ dấu chấm
   const initialCapitalValue = parseInt(initialCapitalInput.value.replace(/\./g, '')) || 10000000;
@@ -1547,36 +1666,6 @@ function compareAndHighlight() {
       autoOuts[index].classList.add('match');
     }
   });
-}
-
-// Copy data from main inputs to auto outputs and clear main inputs
-function copyToAutoOuts() {
-  const mainVals = [...inputs].map(i => i.value);
-  if (mainVals.some(v => v !== "")) {
-    // Copy to auto outputs
-    mainVals.forEach((val, i) => {
-      autoOuts[i].value = val;
-    });
-    
-    // Compute encryption
-    compute(true);
-    
-    // Compare and highlight matches
-    compareAndHighlight();
-    
-    // Process betting if active
-    if (bettingActive) {
-      const autoInputVals = [...autoOuts].map(i => i.value);
-      const outputVals = [...outputs].map(i => i.value);
-      processBetting(autoInputVals, outputVals);
-    }
-    
-    // Chỉ clear inputs khi không trong betting mode
-    if (!bettingActive) {
-      inputs.forEach(i => i.value = "");
-      inputs[0].focus();
-    }
-  }
 }
 
 // Main encryption/decryption function
@@ -1852,14 +1941,47 @@ document.getElementById("import").onclick = importState;
 
 // Betting system event listeners
 startBettingBtn.onclick = startBetting;
+setCapitalBtn.onclick = setCapital;
 
-// Multiplier input validation
+// Multiplier input validation và auto-focus
 multiplierInputs.forEach((input, index) => {
   input.addEventListener('input', () => {
-    let value = parseInt(input.value) || 1;
-    if (value < 1) value = 1;
-    if (value > 100) value = 100;
+    // Cho phép giá trị bất kỳ, chỉ đảm bảo không rỗng
+    let value = parseInt(input.value) || 0;
+    if (value < 0) value = 0; // Chỉ đảm bảo không âm
     input.value = value;
+    
+    // Nếu ô đã có giá trị, tự động focus sang ô tiếp theo sau 2 giây
+    if (input.value !== '' && input.value !== '0' && index < multiplierInputs.length - 1) {
+      setTimeout(() => {
+        multiplierInputs[index + 1].focus();
+      }, 2000);
+    }
+    
+    // Kiểm tra nếu nhập xong ô số 5 và tất cả ô đều có giá trị
+    if (index === multiplierInputs.length - 1 && input.value !== '' && input.value !== '0') {
+      // Kiểm tra tất cả các ô đều đã có giá trị
+      const allFilled = [...multiplierInputs].every(inp => inp.value !== '' && inp.value !== '0');
+      
+      if (allFilled) {
+        // Kích hoạt nút Play nhấp nháy
+        startBettingBtn.classList.add('play-pulse');
+        
+        // Hiển thị thông báo bấm Play để bắt đầu chơi
+        gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU CHƠI!';
+        gameStatusDisplay.classList.remove('warning', 'bet-prompt');
+        gameStatusDisplay.classList.add('play-prompt');
+        gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.3))';
+        gameStatusDisplay.style.border = '3px solid #3b82f6';
+        gameStatusDisplay.style.color = '#ffffff';
+        gameStatusDisplay.style.fontSize = '1.3em';
+        
+        // Focus vào nút Play
+        setTimeout(() => {
+          startBettingBtn.focus();
+        }, 1000);
+      }
+    }
   });
 });
 
@@ -1887,9 +2009,19 @@ updateCapitalDisplay();
 // Disable inputs initially
 inputs.forEach(inp => inp.classList.add('disabled'));
 
-// Hiển thị thông báo nhấp nháy yêu cầu bấm Play
-gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
-gameStatusDisplay.classList.add('play-prompt');
+// Đảm bảo nút Play không nhấp nháy khi tải trang
+startBettingBtn.classList.remove('play-pulse');
+
+// Hiển thị thông báo hướng dẫn nhập vốn
+gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn và mức cược để bắt đầu';
+gameStatusDisplay.classList.remove('play-prompt', 'warning', 'bet-prompt');
+gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
+gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
+gameStatusDisplay.style.color = '#e2e8f0';
+gameStatusDisplay.style.fontSize = '1.2em';
+
+// Focus vào ô input vốn ban đầu
+initialCapitalInput.focus();
 
 // Focus on first input after initialization
 inputs[0].focus();
@@ -1897,9 +2029,3 @@ inputs[0].focus();
 
 </body>
 </html>
-
-
-
-
-
-
