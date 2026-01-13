@@ -125,6 +125,13 @@
     border-color: rgba(96, 165, 250, 0.5);
   }
 
+  input.in.disabled {
+    cursor: not-allowed;
+    background: rgba(51, 65, 85, 0.8);
+    border-color: rgba(148, 163, 184, 0.2);
+    color: #64748b;
+  }
+
   input.in:focus {
     border-color: #60a5fa;
     outline: none;
@@ -390,6 +397,220 @@
     margin-top: 5px;
   }
 
+  .capital-section {
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .capital-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-top: 15px;
+  }
+
+  .capital-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .capital-input-group input {
+    width: 200px;
+    padding: 10px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 16px;
+  }
+
+  .capital-displays {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .capital-display {
+    font-size: 2em;
+    font-weight: bold;
+    color: #10b981;
+    text-align: center;
+    padding: 15px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 12px;
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    min-width: 200px;
+  }
+
+  .profit-display {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #f59e0b;
+    text-align: center;
+    padding: 10px;
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: 10px;
+    border: 2px solid rgba(245, 158, 11, 0.3);
+    min-width: 200px;
+  }
+
+  .profit-display.positive {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  .profit-display.negative {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .input-betting-section {
+    margin-bottom: 20px;
+  }
+
+  .output-section, .auto-input-section {
+    margin-bottom: 20px;
+  }
+
+  .game-info-section {
+    margin-bottom: 30px;
+  }
+
+  .multiplier-inputs {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
+  .multiplier-input {
+    width: 50px;
+    height: 38px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.8);
+    color: #f59e0b;
+    transition: all 0.3s ease;
+  }
+
+  .multiplier-input:focus {
+    border-color: #f59e0b;
+    outline: none;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+  }
+
+  .x1000-display {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #ef4444;
+    margin-left: 10px;
+    padding: 8px 15px;
+    background: rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+  }
+
+  .betting-history {
+    max-height: 150px;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    margin-top: 15px;
+  }
+
+  .bet-history-item {
+    padding: 8px;
+    margin: 5px 0;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    border-left: 3px solid #f59e0b;
+  }
+
+  .bet-history-item.win {
+    border-left-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+  }
+
+  .bet-history-item.lose {
+    border-left-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  .game-status {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1));
+    border-radius: 12px;
+    font-weight: bold;
+    margin: 15px 0;
+    border: 2px solid rgba(245, 158, 11, 0.3);
+    font-size: 1.2em;
+    transition: all 0.3s ease;
+  }
+
+  .game-status.warning {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(185, 28, 28, 0.3));
+    border: 3px solid #ef4444;
+    color: #ffffff;
+    font-size: 1.4em;
+    animation: warningPulse 0.8s ease-in-out infinite;
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+
+  .game-status.play-prompt {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.3));
+    border: 3px solid #3b82f6;
+    color: #ffffff;
+    font-size: 1.3em;
+    animation: playPromptPulse 1s ease-in-out infinite;
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+  }
+
+  @keyframes warningPulse {
+    0%, 100% { 
+      transform: scale(1); 
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(185, 28, 28, 0.3));
+    }
+    50% { 
+      transform: scale(1.08); 
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.8);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.5), rgba(185, 28, 28, 0.5));
+    }
+  }
+
+  @keyframes playPromptPulse {
+    0%, 100% { 
+      transform: scale(1); 
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.3));
+    }
+    50% { 
+      transform: scale(1.06); 
+      box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(29, 78, 216, 0.5));
+    }
+  }
+
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -439,12 +660,33 @@
     </div>
   </div>
 
+  
+  <!-- Capital Display Section -->
+  <div class="capital-section">
+    <div class="section-title">
+      <span class="icon">💰</span>
+      Tổng Vốn Hiện Tại
+    </div>
+    <div class="capital-controls">
+      <div class="capital-input-group">
+        <input type="number" id="initialCapital" value="10000000" min="1000" step="1000" placeholder="Vốn ban đầu">
+        <button id="startBetting" class="btn-primary">🎮 Play</button>
+      </div>
+      <div class="capital-displays">
+        <div class="capital-display" id="currentCapital">10,000,000</div>
+        <div class="profit-display" id="profitDisplay">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input and Betting Section -->
   <div class="main-grid">
     <div class="section">
       <div class="section-title">
         <span class="icon">📥</span>
-        Input Bits
+        Input Bits & Mức Cược
       </div>
+      
       <div class="bit-inputs">
         <input class="in" maxlength="1" placeholder="0/1">
         <input class="in" maxlength="1" placeholder="0/1">
@@ -454,16 +696,15 @@
       </div>
       
       <div class="section-title" style="margin-top: 20px;">
-        <span class="icon">🔄</span>
-        Auto-Processing Input
-        <span style="font-size: 0.8em; color: #f59e0b; margin-left: 10px;">🟡 = Match with Output</span>
+        <span class="icon">🎲</span>
+        Mức Cược (x1000)
       </div>
-      <div class="bit-inputs">
-        <input class="auto-out" readonly>
-        <input class="auto-out" readonly>
-        <input class="auto-out" readonly>
-        <input class="auto-out" readonly>
-        <input class="auto-out" readonly>
+      <div class="multiplier-inputs">
+        <input type="number" class="multiplier-input" id="mult1" value="2" min="1" max="100">
+        <input type="number" class="multiplier-input" id="mult2" value="4" min="1" max="100">
+        <input type="number" class="multiplier-input" id="mult3" value="8" min="1" max="100">
+        <input type="number" class="multiplier-input" id="mult4" value="16" min="1" max="100">
+        <input type="number" class="multiplier-input" id="mult5" value="32" min="1" max="100">
       </div>
     </div>
 
@@ -479,6 +720,35 @@
         <input class="out" readonly>
         <input class="out" readonly>
       </div>
+      
+      <div class="section-title" style="margin-top: 20px;">
+        <span class="icon">🔄</span>
+        Auto-Processing Input
+        <span style="font-size: 0.8em; color: #f59e0b; margin-left: 10px;">🟡 = Match with Output</span>
+      </div>
+      
+      <button id="randomBtn" class="btn-secondary" style="margin-bottom: 15px; width: 100%; display: none;">
+        🎲 Random 5 Bit (Auto)
+      </button>
+      
+      <div class="bit-inputs">
+        <input class="auto-out" readonly>
+        <input class="auto-out" readonly>
+        <input class="auto-out" readonly>
+        <input class="auto-out" readonly>
+        <input class="auto-out" readonly>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Status and History -->
+  <div class="game-info-section">
+    <div class="game-status" id="gameStatus">
+      🎯 Sẵn sàng đặt cược - Nhập 5 bit để bắt đầu
+    </div>
+    
+    <div class="betting-history" id="bettingHistory">
+      <div class="bet-history-item">Hệ thống đặt cược đã sẵn sàng</div>
     </div>
   </div>
 
@@ -563,6 +833,15 @@ let previousCipher = 0;
 let operationHistory = [];
 let currentMode = 'ecb';
 
+// Betting system variables
+let currentCapital = 10000000;
+let initialCapital = 10000000;
+let bettingActive = false;
+let bettingHistory = [];
+let currentBetRound = 0;
+let baseBetAmount = 1000;
+let roundProfit = 0; // Lãi của round hiện tại
+
 // DOM elements
 const inputs = document.querySelectorAll(".in");
 const autoOuts = document.querySelectorAll(".auto-out");
@@ -570,6 +849,16 @@ const outputs = document.querySelectorAll(".out");
 const info = document.getElementById("info");
 const rotorGrid = document.getElementById("rotorGrid");
 const history = document.getElementById("history");
+
+// Betting DOM elements
+const initialCapitalInput = document.getElementById("initialCapital");
+const currentCapitalDisplay = document.getElementById("currentCapital");
+const profitDisplay = document.getElementById("profitDisplay");
+const startBettingBtn = document.getElementById("startBetting");
+const gameStatusDisplay = document.getElementById("gameStatus");
+const bettingHistoryPanel = document.getElementById("bettingHistory");
+const multiplierInputs = document.querySelectorAll(".multiplier-input");
+const randomBtn = document.getElementById("randomBtn");
 
 // Initialize rotor grid display
 function initRotorDisplay() {
@@ -835,6 +1124,149 @@ function addToHistory(message) {
   ).join('');
 }
 
+// Betting system functions
+function formatCurrency(amount) {
+  return amount.toLocaleString('vi-VN');
+}
+
+function updateCapitalDisplay() {
+  currentCapitalDisplay.textContent = formatCurrency(currentCapital);
+  
+  // Hiển thị lãi của round hiện tại
+  profitDisplay.textContent = (roundProfit >= 0 ? '+' : '') + formatCurrency(roundProfit);
+  
+  // Update profit display styling
+  profitDisplay.classList.remove('positive', 'negative');
+  if (roundProfit > 0) {
+    profitDisplay.classList.add('positive');
+  } else if (roundProfit < 0) {
+    profitDisplay.classList.add('negative');
+  }
+  
+  if (currentCapital <= 0) {
+    gameStatusDisplay.textContent = '💔 Hết vốn - Kết thúc trò chơi!';
+    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
+    bettingActive = false;
+  }
+}
+
+function addToBettingHistory(message, isWin = null) {
+  const timestamp = new Date().toLocaleTimeString();
+  const historyItem = document.createElement('div');
+  historyItem.className = 'bet-history-item';
+  if (isWin === true) historyItem.classList.add('win');
+  if (isWin === false) historyItem.classList.add('lose');
+  historyItem.textContent = `[${timestamp}] ${message}`;
+  
+  bettingHistoryPanel.insertBefore(historyItem, bettingHistoryPanel.firstChild);
+  
+  if (bettingHistoryPanel.children.length > 10) {
+    bettingHistoryPanel.removeChild(bettingHistoryPanel.lastChild);
+  }
+}
+
+function startBetting() {
+  const initialCapitalValue = parseInt(initialCapitalInput.value) || 10000000;
+  if (initialCapitalValue < 1000) {
+    gameStatusDisplay.textContent = '⚠️ Vốn tối thiểu là 1,000';
+    gameStatusDisplay.classList.add('warning');
+    setTimeout(() => {
+      gameStatusDisplay.classList.remove('warning');
+      gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
+      gameStatusDisplay.classList.add('play-prompt');
+    }, 3000);
+    return;
+  }
+  
+  initialCapital = initialCapitalValue;
+  currentCapital = initialCapitalValue;
+  bettingActive = true;
+  currentBetRound = 0;
+  updateCapitalDisplay();
+  
+  // Enable input fields
+  inputs.forEach(inp => inp.classList.remove('disabled'));
+  
+  // Tắt thông báo nhấp nháy và hiển thị trạng thái chơi
+  gameStatusDisplay.classList.remove('play-prompt', 'warning');
+  gameStatusDisplay.textContent = '🎮 Đang chơi - Nhập 5 bit để bắt đầu';
+  gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))';
+  
+  addToBettingHistory('Bắt đầu chơi với vốn: ' + formatCurrency(currentCapital));
+  addToHistory('Game started with capital: ' + formatCurrency(currentCapital));
+}
+
+function processBetting(autoInputVals, outputVals) {
+  if (!bettingActive) return;
+  
+  currentBetRound++;
+  const multipliers = Array.from(multiplierInputs).map(input => parseInt(input.value) || 1);
+  let totalDeducted = 0;
+  let matchFound = false;
+  let matchPosition = -1;
+  
+  // Reset lãi round mới
+  roundProfit = 0;
+  
+  console.log('Processing betting round', currentBetRound, 'multipliers:', multipliers);
+  
+  // Check từng bit từ 1-5
+  for (let i = 0; i < 5; i++) {
+    if (autoInputVals[i] !== "") {
+      const betAmount = baseBetAmount * multipliers[i];
+      
+      console.log(`Bit ${i + 1}: auto=${autoInputVals[i]}, output=${outputVals[i]}, bet=${betAmount}`);
+      
+      if (autoInputVals[i] === outputVals[i]) {
+        // Có match - cộng 80% và TIẾP TỤC CHƠI (không dừng)
+        matchFound = true;
+        matchPosition = i;
+        const winAmount = Math.floor(betAmount * 0.8);
+        currentCapital += winAmount;
+        roundProfit += winAmount; // Cộng vào lãi round
+        
+        console.log(`MATCH at position ${i + 1}! Win amount: ${winAmount}`);
+        
+        gameStatusDisplay.textContent = `🎉 Thắng! +${formatCurrency(winAmount)} tại vị trí ${i + 1} - Tiếp tục vòng ${currentBetRound + 1}`;
+        addToBettingHistory(`Thắng ${formatCurrency(winAmount)} tại vị trí ${i + 1} - Vốn: ${formatCurrency(currentCapital)} - Tiếp tục chơi`, true);
+        
+        // KHÔNG dừng betting - tiếp tục chơi
+        break;
+      } else {
+        // Không match - trừ tiền
+        currentCapital -= betAmount;
+        totalDeducted += betAmount;
+        roundProfit -= betAmount; // Trừ vào lãi round
+        
+        console.log(`NO MATCH at position ${i + 1}. Deducting: ${betAmount}`);
+        
+        gameStatusDisplay.textContent = `❌ Bit ${i + 1} không trùng - Trừ ${formatCurrency(betAmount)} - Vòng ${currentBetRound}`;
+        addToBettingHistory(`Bit ${i + 1} không trùng - Trừ ${formatCurrency(betAmount)} - Vốn: ${formatCurrency(currentCapital)}`, false);
+        
+        // Kiểm tra hết vốn
+        if (currentCapital <= 0) {
+          bettingActive = false;
+          gameStatusDisplay.textContent = '💔 Hết vốn - Kết thúc trò chơi!';
+          break;
+        }
+      }
+    }
+  }
+  
+  updateCapitalDisplay();
+  
+  // Auto clear inputs for next round if still betting
+  if (bettingActive && currentCapital > 0) {
+    setTimeout(() => {
+      inputs.forEach(i => i.value = "");
+      inputs[0].focus();
+      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập 5 bit tiếp theo`;
+    }, 1500);
+  }
+  
+  console.log('Final capital:', currentCapital, 'Betting active:', bettingActive, 'Round profit:', roundProfit);
+}
+
 // Auto-processing function
 function autoCompute() {
   const vals = [...autoInputs].map(i => i.value);
@@ -894,11 +1326,18 @@ function copyToAutoOuts() {
     // Compare and highlight matches
     compareAndHighlight();
     
-    // Clear main inputs
-    inputs.forEach(i => i.value = "");
+    // Process betting if active
+    if (bettingActive) {
+      const autoInputVals = [...autoOuts].map(i => i.value);
+      const outputVals = [...outputs].map(i => i.value);
+      processBetting(autoInputVals, outputVals);
+    }
     
-    // Focus back to first input
-    inputs[0].focus();
+    // Chỉ clear inputs khi không trong betting mode
+    if (!bettingActive) {
+      inputs.forEach(i => i.value = "");
+      inputs[0].focus();
+    }
   }
 }
 
@@ -953,7 +1392,31 @@ function softReset() {
   previousCipher = 0;
   info.textContent = "Advanced Enigma Ready - 10 Rotors Active";
   inputs[0].focus();
-  addToHistory('System reset - Ready for new operation');
+  
+  // Reset betting system
+  bettingActive = false;
+  currentBetRound = 0;
+  roundProfit = 0;
+  const resetCapital = parseInt(initialCapitalInput.value) || 10000000;
+  initialCapital = resetCapital;
+  currentCapital = resetCapital;
+  updateCapitalDisplay();
+  
+  // Disable input fields
+  inputs.forEach(inp => inp.classList.add('disabled'));
+  
+  // Hide random button
+  randomBtn.style.display = 'none';
+  
+  // Quay lại thông báo nhấp nháy yêu cầu bấm Play
+  gameStatusDisplay.classList.remove('warning');
+  gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
+  gameStatusDisplay.classList.add('play-prompt');
+  
+  // Clear betting history
+  bettingHistoryPanel.innerHTML = '<div class="bet-history-item">Hệ thống đặt cược đã sẵn sàng</div>';
+  
+  addToHistory('System reset - Betting game reset - Ready for new operation');
 }
 
 // Export state
@@ -1015,6 +1478,42 @@ function importState() {
 // Event listeners for main inputs
 inputs.forEach((inp, idx) => {
   inp.addEventListener("input", () => {
+    // Chỉ cho phép nhập khi betting đã được kích hoạt
+    if (!bettingActive) {
+      inp.value = "";
+      
+      // Hiển thị thông báo nổi bật
+      gameStatusDisplay.textContent = '⚠️ VUI LÒNG BẤM "PLAY" TRƯỚC KHI NHẬP BIT!';
+      gameStatusDisplay.classList.add('warning');
+      
+      // Thông báo trình duyệt
+      if (Notification.permission === "granted") {
+        new Notification("Enigma Betting", {
+          body: "Vui lòng bấm 'Play' trước khi nhập bit!",
+          icon: "⚠️",
+          requireInteraction: true
+        });
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            new Notification("Enigma Betting", {
+              body: "Vui lòng bấm 'Play' trước khi nhập bit!",
+              icon: "⚠️",
+              requireInteraction: true
+            });
+          }
+        });
+      }
+      
+      // Tự động tắt sau 3 giây
+      setTimeout(() => {
+        gameStatusDisplay.classList.remove('warning');
+        gameStatusDisplay.textContent = '� BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
+        gameStatusDisplay.classList.add('play-prompt');
+      }, 3000);
+      return;
+    }
+    
     if (inp.value !== "0" && inp.value !== "1") {
       inp.value = "";
       return;
@@ -1022,10 +1521,16 @@ inputs.forEach((inp, idx) => {
     if (idx < inputs.length - 1)
       inputs[idx + 1].focus();
     
-    // Check if all inputs are filled, then auto copy and process
+    // Check if all inputs are filled, then auto process random
     const allFilled = [...inputs].every(i => i.value !== "");
     if (allFilled) {
-      copyToAutoOuts();
+      // Compute encryption
+      compute(true);
+      
+      // Auto trigger random immediately
+      setTimeout(() => {
+        processRandom();
+      }, 500);
     }
   });
 
@@ -1035,14 +1540,63 @@ inputs.forEach((inp, idx) => {
   });
 });
 
-// Remove auto inputs event listeners (no longer needed)
-// Event listeners for auto inputs section removed
+// Random function
+function generateRandomBits() {
+  const randomBits = [];
+  for (let i = 0; i < 5; i++) {
+    randomBits.push(Math.random() < 0.5 ? '0' : '1');
+  }
+  return randomBits;
+}
+
+function processRandom() {
+  const randomBits = generateRandomBits();
+  
+  // Hiển thị random bits trong auto-out
+  randomBits.forEach((bit, i) => {
+    autoOuts[i].value = bit;
+  });
+  
+  // Compare and highlight matches
+  compareAndHighlight();
+  
+  // Process betting if active
+  if (bettingActive) {
+    const outputVals = [...outputs].map(i => i.value);
+    processBetting(randomBits, outputVals);
+  }
+  
+  // Clear inputs for next round if still betting
+  if (bettingActive && currentCapital > 0) {
+    setTimeout(() => {
+      inputs.forEach(i => i.value = "");
+      inputs[0].focus();
+      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập 5 bit tiếp theo`;
+    }, 1500);
+  }
+}
+
+// Event listener for random button
+randomBtn.onclick = processRandom;
 
 document.getElementById("encrypt").onclick = () => compute(true);
 document.getElementById("decrypt").onclick = () => compute(false);
 document.getElementById("reset").onclick = softReset;
 document.getElementById("export").onclick = exportState;
 document.getElementById("import").onclick = importState;
+
+// Betting system event listeners
+startBettingBtn.onclick = startBetting;
+
+// Multiplier input validation
+multiplierInputs.forEach((input, index) => {
+  input.addEventListener('input', () => {
+    let value = parseInt(input.value) || 1;
+    if (value < 1) value = 1;
+    if (value > 100) value = 100;
+    input.value = value;
+  });
+});
 
 // Mode change handler
 document.getElementById('mode').addEventListener('change', () => {
@@ -1063,6 +1617,14 @@ document.getElementById('customIV').addEventListener('change', () => {
 initRotorDisplay();
 initState();
 softReset();
+updateCapitalDisplay();
+
+// Disable inputs initially
+inputs.forEach(inp => inp.classList.add('disabled'));
+
+// Hiển thị thông báo nhấp nháy yêu cầu bấm Play
+gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
+gameStatusDisplay.classList.add('play-prompt');
 
 // Focus on first input after initialization
 inputs[0].focus();
