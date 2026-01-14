@@ -1618,12 +1618,12 @@ function updateCapitalDisplay() {
       });
     }
     
-    addToBettingHistory(`🎉 Đạt ngưỡng lãi 20%! Lãi: ${formatCurrencyWithSeparator(totalProfit)} - Dừng game`, true);
+    addToBettingHistory(`🎉 Đạt ngưỡng 20% ! THU VỀ: ${formatCurrencyWithSeparator(totalProfit)} - PERFECT`, true);
     addToHistory(`Profit threshold reached: ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%)`);
   }
   
   if (currentCapital <= 0) {
-    gameStatusDisplay.textContent = '💔 Hết Lương thực - Kết thúc trò chơi!';
+    gameStatusDisplay.textContent = '💔 Hết Lương thực - BẠN ĐÃ XANH CỎ XIN CHÚC MỪNG!';
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
     bettingActive = false;
   }
@@ -1653,7 +1653,7 @@ function setCapital() {
     gameStatusDisplay.classList.add('warning');
     setTimeout(() => {
       gameStatusDisplay.classList.remove('warning');
-      gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
+      gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" để BẮT ĐẦU chiến đấu!';
       gameStatusDisplay.classList.add('play-prompt');
     }, 3000);
     return;
@@ -1715,11 +1715,11 @@ function setCapital() {
       gameStatusDisplay.classList.add('warning');
       setTimeout(() => {
         gameStatusDisplay.classList.remove('warning');
-        gameStatusDisplay.textContent = '🎮 Đang chơi - Nhập 5 bit để bắt đầu';
+        gameStatusDisplay.textContent = '🎮 Đang chiến đấu - Nhập 5 bit để bắt đầu';
       }, 3000);
     } else {
       // Vốn không đổi
-      gameStatusDisplay.textContent = '💰 Lương thực không thay đổi - Vui lòng các tầng Tên lửa';
+      gameStatusDisplay.textContent = '💰 Lương thực không thay đổi - Vui lòng nhập số lượng Tên lửa';
       gameStatusDisplay.classList.remove('warning');
       gameStatusDisplay.classList.add('bet-prompt');
       gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
@@ -1740,7 +1740,7 @@ function startBetting() {
     gameStatusDisplay.classList.add('warning');
     setTimeout(() => {
       gameStatusDisplay.classList.remove('warning');
-      gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
+      gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" để BẮT ĐẦU chiến đấu!';
       gameStatusDisplay.classList.add('play-prompt');
     }, 3000);
     return;
@@ -1783,13 +1783,13 @@ function processBetting(autoInputVals, outputVals) {
   
   // Kiểm tra vốn còn đủ để cược không
   if (currentCapital < totalBet) {
-    gameStatusDisplay.textContent = `💔 Lương thực không đủ để chiến đấu! Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)}. Vui lòng reset game để tiếp tục!`;
+    gameStatusDisplay.textContent = `💔 Lương thực không đủ để chiến đấu! Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)}. Vui lòng reset game để vào vạch xuất phát!`;
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(251, 191, 36, 0.3))';
     gameStatusDisplay.style.border = '2px solid #f59e0b';
     gameStatusDisplay.style.color = '#ffffff';
     gameStatusDisplay.classList.add('warning', 'insufficient-funds-pulse');
     bettingActive = false;
-    addToBettingHistory(`Hết Lương thực - Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)} - Yêu cầu reset game`, false);
+    addToBettingHistory(`Hết Lương thực - Cần ${formatCurrencyWithSeparator(totalBet)} kg, hiện tại chỉ có ${formatCurrencyWithSeparator(currentCapital)} - Yêu cầu reset game trở về vạch xuất phát`, false);
     return;
   }
   
@@ -1820,7 +1820,7 @@ function processBetting(autoInputVals, outputVals) {
         console.log(`MATCH at position ${i + 1}! Win amount: ${winAmount}`);
         
         gameStatusDisplay.textContent = `🎉 Thắng! +${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Tiếp tục vòng ${currentBetRound + 1}`;
-        addToBettingHistory(`Thắng ${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Lương thực: ${formatCurrencyWithSeparator(currentCapital)} - Tiếp tục chơi`, true);
+        addToBettingHistory(`Thắng ${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Lương thực: ${formatCurrencyWithSeparator(currentCapital)} - Tiếp tục chiến đấu`, true);
         
         // KHÔNG dừng betting - tiếp tục chơi
         break;
@@ -2103,7 +2103,7 @@ inputs.forEach((inp, idx) => {
       // Tự động tắt sau 3 giây
       setTimeout(() => {
         gameStatusDisplay.classList.remove('warning');
-        gameStatusDisplay.textContent = '� BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU TRÒ CHƠI!';
+        gameStatusDisplay.textContent = '� BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU CHIẾN ĐẤU!';
         gameStatusDisplay.classList.add('play-prompt');
       }, 3000);
       return;
