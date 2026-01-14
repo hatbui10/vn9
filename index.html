@@ -441,9 +441,22 @@
   }
 
   .btn-danger {
-    background: linear-gradient(135deg, #ef4444, #f97316);
-    color: white;
-  }
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: white;
+
+   font-size: 1em;
+  padding: 0.8em 1.4em;
+  
+  min-width: clamp(40px, 20vw, 100px);
+   line-height: 1.2;
+  padding: 0.8em 1.4em;
+  height: auto;
+  
+  border-radius: 10px;
+  border: 2px solid rgba(239, 68, 68, 0.5);
+  display: block;
+  margin: 40px auto 0;
+}
 
   .btn-danger:hover {
     transform: translateY(-2px);
@@ -1013,7 +1026,11 @@
         <input type="number" class="multiplier-input" id="mult5" inputmode="numeric">
       </div>
    
-<button id="startBetting" class="btn-primary play-pulse">🎮 Play</button>
+<div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 35px;">
+  <button id="startBetting" class="btn-primary play-pulse">🎮 Play</button>
+   
+
+  </div>
         
       <div class="section-title">
         <span class="icon">📥</span>
@@ -1060,7 +1077,9 @@
         <input class="auto-out" readonly>
         <input class="auto-out" readonly>
       </div>
+     <button id="reset" class="btn-danger">🔄 Reset Game</button>
     </div>
+    
   </div>
 
   <!-- Game Status and History -->
@@ -1089,8 +1108,7 @@
   <div class="button-group">
        <button id="encrypt" class="btn-primary">🔐 Encrypt</button>
     <button id="decrypt" class="btn-secondary">🔓 Decrypt</button>
-    <button id="reset" class="btn-danger">🔄 Reset</button>
-    <button id="export" class="btn-primary">💾 Export State</button>
+        <button id="export" class="btn-primary">💾 Export State</button>
     <button id="import" class="btn-secondary">📂 Import State</button>
   </div>
 
@@ -1481,7 +1499,7 @@ function updateCapitalDisplay() {
     bettingActive = false;
     
     // Hiển thị thông báo
-    gameStatusDisplay.textContent = '🎉 Perfect!! Hãy biết dừng lại đúng lúc $$$ -  Tham lam là mất hết đấy @-@';
+    gameStatusDisplay.textContent = '🎉 Hôm nay,như thế là đủ rồi ngày mai hãy tiếp tục!Tham lam là mất hết đấy @-@';
     gameStatusDisplay.classList.remove('play-prompt', 'warning');
     gameStatusDisplay.classList.add('success-pulse');
     gameStatusDisplay.style.border = '3px solid #10b981';
@@ -2107,6 +2125,48 @@ document.getElementById('customIV').addEventListener('change', () => {
   initState();
 });
 
+// Reset Game button handler
+document.getElementById('reset').addEventListener('click', () => {
+  // Reset tất cả biến game
+  currentCapital = 0;
+  initialCapital = 0;
+  bettingActive = false;
+  bettingHistory = [];
+  currentBetRound = 0;
+  roundProfit = 0;
+  profitThresholdReached = false;
+  
+  // Reset displays
+  currentCapitalDisplay.textContent = '0';
+  profitDisplay.textContent = '0';
+  profitDisplay.classList.remove('positive', 'negative');
+  
+  // Clear inputs
+  multiplierInputs.forEach(input => input.value = '');
+  inputs.forEach(input => {
+    input.value = '';
+    input.classList.add('disabled');
+  });
+  outputs.forEach(output => output.value = '');
+  autoOuts.forEach(output => output.value = '');
+  
+  // Reset game status
+  gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn !!!';
+  gameStatusDisplay.classList.remove('play-prompt', 'warning', 'bet-prompt', 'success-pulse');
+  gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
+  gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
+  
+  // Clear betting history
+  bettingHistoryPanel.innerHTML = '<div class="bet-history-item">Hệ thống đặt cược đã sẵn sàng</div>';
+  
+  // Reset enigma state
+  softReset();
+  initState();
+  
+  // Focus on first input
+  inputs[0].focus();
+});
+
 // Initialize
 initRotorDisplay();
 initState();
@@ -2136,4 +2196,5 @@ inputs[0].focus();
 
 </body>
 </html>
+
 
