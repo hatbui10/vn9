@@ -1103,7 +1103,7 @@
 
 
  <div class="game-status" id="gameStatus">
-      🎯 Sẵn sàng phóng Tên Lửa - Nhập 5 bit để bắt đầu
+      🎯 Sẵn sàng phóng Tên Lửa - Nhập tọa độ để bắt đầu
     </div>
 
   <!-- Input and Betting Section -->
@@ -1173,7 +1173,7 @@
         <input class="auto-out" readonly>
         <input class="auto-out" readonly>
       </div>
-     <button id="reset" class="btn-danger">🔄 Reset Game</button>
+     <button id="reset" class="btn-danger">🔄 Reset Cuộc Chiến</button>
     </div>
     
   </div>
@@ -1668,7 +1668,7 @@ function setCapital() {
     updateCapitalDisplay();
     
     // Hiển thị thông báo thành công
-    gameStatusDisplay.textContent = `💰 Đã nhập Số lượng tên lửa: ${formatCurrencyWithSeparator(capitalValue)} - Vui lòng nhập Số lượng tên lửa`;
+    gameStatusDisplay.textContent = `💰 Đã nhập Số lượng tên lửa: ${formatCurrencyWithSeparator(capitalValue)} - Vui lòng nhập Tốc độ tên lửa`;
     gameStatusDisplay.classList.remove('warning');
     gameStatusDisplay.classList.add('bet-prompt', 'wide-notification');
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
@@ -1694,7 +1694,7 @@ function setCapital() {
       updateCapitalDisplay();
       
       // Hiển thị thông báo tăng vốn thành công
-      gameStatusDisplay.textContent = `💰 Đã tăng Số lượng tên lửa: +${formatCurrencyWithSeparator(capitalIncrease)} - Vui lòng nhập số lượng Tên lửa`;
+      gameStatusDisplay.textContent = `💰 Đã tăng Số lượng tên lửa: +${formatCurrencyWithSeparator(capitalIncrease)} - Vui lòng nhập Tốc độ Tên lửa`;
       gameStatusDisplay.classList.remove('warning');
       gameStatusDisplay.classList.add('bet-prompt', 'wide-notification');
       gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
@@ -1719,7 +1719,7 @@ function setCapital() {
       }, 3000);
     } else {
       // Vốn không đổi
-      gameStatusDisplay.textContent = '💰 Số lượng tên lửa không thay đổi - Vui lòng nhập số lượng Tên lửa';
+      gameStatusDisplay.textContent = '💰 Số lượng tên lửa không thay đổi - Vui lòng nhập Tọa độ Tên lửa';
       gameStatusDisplay.classList.remove('warning');
       gameStatusDisplay.classList.add('bet-prompt');
       gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
@@ -1838,7 +1838,7 @@ function processBetting(autoInputVals, outputVals) {
         // Kiểm tra hết vốn
         if (currentCapital <= 0) {
           bettingActive = false;
-          gameStatusDisplay.textContent = '💔 Hết TÊN LỬA rồi - Đời là thế bạn ạ!';
+          gameStatusDisplay.textContent = '💔 Hết TÊN LỬA rồi - Bạn vẫn còn thở chứ !';
           break;
         }
       }
@@ -1852,7 +1852,7 @@ function processBetting(autoInputVals, outputVals) {
     setTimeout(() => {
       inputs.forEach(i => i.value = "");
       inputs[0].focus();
-      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập 5 bit tiếp theo`;
+      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập tọa độ tiếp theo`;
     }, 1500);
   }
   
@@ -2078,13 +2078,13 @@ inputs.forEach((inp, idx) => {
       inp.value = "";
       
       // Hiển thị thông báo nổi bật
-      gameStatusDisplay.textContent = '⚠️ VUI LÒNG BẤM "PLAY" TRƯỚC KHI NHẬP BIT!';
+      gameStatusDisplay.textContent = '⚠️ VUI LÒNG BẤM "PLAY" TRƯỚC KHI NHẬP TỌA ĐỘ !';
       gameStatusDisplay.classList.add('warning');
       
       // Thông báo trình duyệt
       if (Notification.permission === "granted") {
         new Notification("Enigma Betting", {
-          body: "Vui lòng bấm 'Play' trước khi nhập bit!",
+          body: "Vui lòng bấm 'Play' trước khi nhập Tọa độ !",
           icon: "⚠️",
           requireInteraction: true
         });
@@ -2092,7 +2092,7 @@ inputs.forEach((inp, idx) => {
         Notification.requestPermission().then(permission => {
           if (permission === "granted") {
             new Notification("Enigma Betting", {
-              body: "Vui lòng bấm 'Play' trước khi nhập bit!",
+              body: "Vui lòng bấm 'Play' trước khi nhập Tọa độ !",
               icon: "⚠️",
               requireInteraction: true
             });
@@ -2166,7 +2166,7 @@ function processRandom() {
     setTimeout(() => {
       inputs.forEach(i => i.value = "");
       inputs[0].focus();
-      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập 5 bit tiếp theo`;
+      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập Tọa độ tiếp theo`;
     }, 1500);
   }
 }
@@ -2332,6 +2332,7 @@ inputs[0].focus();
 
 </body>
 </html>
+
 
 
 
