@@ -1501,7 +1501,7 @@ function updateCapitalDisplay() {
     bettingActive = false;
     
     // Hiển thị thông báo
-    gameStatusDisplay.textContent = '🎉 Hôm nay,như thế là đủ rồi ngày mai hãy tiếp tục!Tham lam là mất hết đấy @-@';
+    gameStatusDisplay.textContent = '🎉 Perfect!!!🎉 Perfect!!!🎉 Perfect!!! Hãy dừng lại đúng lúc - Tham lam là mất hết đấy @-@';
     gameStatusDisplay.classList.remove('play-prompt', 'warning');
     gameStatusDisplay.classList.add('success-pulse');
     gameStatusDisplay.style.border = '3px solid #10b981';
@@ -1511,7 +1511,7 @@ function updateCapitalDisplay() {
     // Thông báo trình duyệt
     if (Notification.permission === "granted") {
       new Notification("🎉 Mục Tiêu Đạt Được!", {
-        body: `Lãi ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%) - Hôm nay nhu thế là đủ rồi!`,
+        body: `Lãi ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%) - Hôm nay như thế là đủ rồi!`,
         icon: "🎯",
         requireInteraction: true
       });
@@ -1519,7 +1519,7 @@ function updateCapitalDisplay() {
       Notification.requestPermission().then(permission => {
         if (permission === "granted") {
           new Notification("🎉 Mục Tiêu Đạt Được!", {
-            body: `Lãi ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%) - Hôm nay nhu thế là đủ rồi!`,
+            body: `Lãi ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%) - Hôm nay như thế là đủ rồi!`,
             icon: "🎯",
             requireInteraction: true
           });
@@ -1862,7 +1862,7 @@ function softReset() {
   
   // Hiển thị thông báo yêu cầu nhập vốn
   gameStatusDisplay.classList.remove('warning', 'play-prompt', 'bet-prompt');
-  gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn và mức cược để bắt đầu';
+  gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn để bắt đầu';
   gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
   gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
   gameStatusDisplay.style.color = '#e2e8f0';
