@@ -451,7 +451,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
-  max-width: 800px;
+  max-width: 90%;
   margin: 0 auto;
 }
   .capital-section {
@@ -1048,7 +1048,7 @@
 <body>
 
 <div class="container">
-  <h1>🚀 Advanced Enigma Machine 📡</h1>
+  <h1>🚀 CUỘC CHIẾN SINH TỬ 📡</h1>
     <p class="subtitle">10 Rotors • Multiple Modes • Advanced Cryptography</p>
 
   <div class="control-panel">
@@ -1111,7 +1111,7 @@
     <div class="section">
     
      <div class="section-title" style="margin: 20px;">
-        <span class="icon">🎲</span>
+        <span class="icon">🚀</span>
         Số lượng tên lửa (x1000)
       </div>
       <div class="multiplier-inputs">
@@ -1129,8 +1129,8 @@
   </div>
         
       <div class="section-title">
-        <span class="icon">📥</span>
-        Input Bits & Số lượng tên lửa
+        <span class="icon">📡</span>
+       Nhập tọa độ mục tiêu:
       </div>
       
       <div class="bit-inputs">
@@ -1145,8 +1145,8 @@
      
     <div class="section">
       <div class="section-title">
-        <span class="icon">📤</span>
-        Output Bits
+        <span class="icon">📡</span>
+       Tọa độ đã mã hóa
       </div>
       <div class="bit-inputs">
         <input class="out" readonly>
@@ -1163,7 +1163,7 @@
       </div>
       
       <button id="randomBtn" class="btn-secondary" style="margin-bottom: 15px; width: 100%; display: none;">
-        🎲 Random 5 Bit (Auto)
+        🚀 Random 5 Bit (Auto)
       </button>
       
       <div class="bit-inputs">
@@ -1618,7 +1618,7 @@ function updateCapitalDisplay() {
       });
     }
     
-    addToBettingHistory(`🎉 Đạt ngưỡng 20% ! THU VỀ: ${formatCurrencyWithSeparator(totalProfit)} - PERFECT`, true);
+    addToBettingHistory(`🎉 Đạt ngưỡng lãi 20%! THU VỀ: ${formatCurrencyWithSeparator(totalProfit)} - PERFECT`, true);
     addToHistory(`Profit threshold reached: ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%)`);
   }
   
