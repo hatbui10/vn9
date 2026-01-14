@@ -888,8 +888,8 @@
 
   /* Class cho thông báo rộng 90% */
   .game-status.wide-notification {
-    width: 90%;
-    max-width: 90%;
+    width: 93%;
+    max-width: 93%;
     margin: 15px auto;
   }
 
@@ -2167,7 +2167,7 @@ function processRandom() {
       inputs.forEach(i => i.value = "");
       inputs[0].focus();
       gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập 5 bit tiếp theo`;
-    }, 0);
+    }, 100);
   }
 }
 
@@ -2332,5 +2332,7 @@ inputs[0].focus();
 
 </body>
 </html>
+
+
 
 
