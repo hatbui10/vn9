@@ -1532,7 +1532,7 @@ function updateCapitalDisplay() {
   }
   
   if (currentCapital <= 0) {
-    gameStatusDisplay.textContent = '💔 Hết vốn - Kết thúc trò chơi!';
+    gameStatusDisplay.textContent = '💔 Hết vốn rồi !!! ĐỜI LÀ THẾ @-@!';
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
     bettingActive = false;
   }
@@ -1679,20 +1679,6 @@ function processBetting(autoInputVals, outputVals) {
   
   currentBetRound++;
   const multipliers = Array.from(multiplierInputs).map(input => parseInt(input.value) || 1);
-  const totalBet = multipliers.reduce((sum, mult) => sum + (mult * 1000), 0);
-  
-  // Kiểm tra vốn còn đủ để cược không
-  if (currentCapital < totalBet) {
-    gameStatusDisplay.textContent = `💔 Vốn không đủ để cược! Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)}. Vui lòng reset game để tiếp tục!`;
-    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
-    gameStatusDisplay.style.border = '2px solid #ef4444';
-    gameStatusDisplay.style.color = '#ffffff';
-    gameStatusDisplay.classList.add('warning');
-    bettingActive = false;
-    addToBettingHistory(`Hết vốn - Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)} - Yêu cầu reset game`, false);
-    return;
-  }
-  
   let totalDeducted = 0;
   let matchFound = false;
   let matchPosition = -1;
@@ -2196,7 +2182,7 @@ inputs.forEach(inp => inp.classList.add('disabled'));
 startBettingBtn.classList.remove('play-pulse');
 
 // Hiển thị thông báo hướng dẫn nhập vốn
-gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn và mức cược để bắt đầu';
+gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn ';
 gameStatusDisplay.classList.remove('play-prompt', 'warning', 'bet-prompt');
 gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
 gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
