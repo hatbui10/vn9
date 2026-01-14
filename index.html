@@ -135,6 +135,41 @@
     color: #60a5fa;
   }
 
+  #initialCapital {
+    width: 200px;
+    height: 50px;
+    font-size: 18px;
+    padding: 0 15px;
+    cursor: text;
+    background: rgba(30, 41, 59, 0.9);
+    border: 2px solid rgba(96, 165, 250, 0.5);
+    color: #e2e8f0;
+  }
+
+  #initialCapital:focus {
+    border-color: #60a5fa;
+    outline: none;
+    box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+    background: rgba(30, 41, 59, 1);
+  }
+
+  #setCapital {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    animation: capitalButtonPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes capitalButtonPulse {
+    0%, 100% { 
+      transform: translateY(-2px) scale(1); 
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+    50% { 
+      transform: translateY(-2px) scale(1.05); 
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5);
+    }
+  }
+
   @media (max-width: 768px) {
     input.in {
       width: 50px;
@@ -150,10 +185,21 @@
   }
 
   input.in.disabled {
-    cursor: not-allowed;
+    cursor: not-allowed !important;
     background: rgba(51, 65, 85, 0.8);
     border-color: rgba(148, 163, 184, 0.2);
     color: #64748b;
+  }
+
+  .multiplier-input:disabled {
+    cursor: not-allowed !important;
+    background: rgba(51, 65, 85, 0.8);
+    border-color: rgba(148, 163, 184, 0.2);
+    color: #64748b;
+  }
+
+  .multiplier-input:not(:disabled) {
+    cursor: pointer;
   }
 
   input.in:focus {
@@ -1532,7 +1578,7 @@ function updateCapitalDisplay() {
   }
   
   if (currentCapital <= 0) {
-    gameStatusDisplay.textContent = '💔 Hết vốn rồi !!! ĐỜI LÀ THẾ @-@!';
+    gameStatusDisplay.textContent = '💔 Hết vốn - Kết thúc trò chơi!';
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
     bettingActive = false;
   }
@@ -1583,6 +1629,9 @@ function setCapital() {
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
     gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
     gameStatusDisplay.style.color = '#f59e0b';
+    
+    // Enable multiplier inputs khi nhập vốn thành công
+    multiplierInputs.forEach(inp => inp.disabled = false);
     
     addToBettingHistory(`Nhập vốn: ${formatCurrencyWithSeparator(capitalValue)}`);
     addToHistory(`Capital set to: ${formatCurrencyWithSeparator(capitalValue)}`);
@@ -1679,6 +1728,20 @@ function processBetting(autoInputVals, outputVals) {
   
   currentBetRound++;
   const multipliers = Array.from(multiplierInputs).map(input => parseInt(input.value) || 1);
+  const totalBet = multipliers.reduce((sum, mult) => sum + (mult * 1000), 0);
+  
+  // Kiểm tra vốn còn đủ để cược không
+  if (currentCapital < totalBet) {
+    gameStatusDisplay.textContent = `💔 Vốn không đủ để cược! Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)}. Vui lòng reset game để tiếp tục!`;
+    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
+    gameStatusDisplay.style.border = '2px solid #ef4444';
+    gameStatusDisplay.style.color = '#ffffff';
+    gameStatusDisplay.classList.add('warning');
+    bettingActive = false;
+    addToBettingHistory(`Hết vốn - Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)} - Yêu cầu reset game`, false);
+    return;
+  }
+  
   let totalDeducted = 0;
   let matchFound = false;
   let matchPosition = -1;
@@ -2144,7 +2207,10 @@ document.getElementById('reset').addEventListener('click', () => {
   profitDisplay.classList.remove('positive', 'negative');
   
   // Clear inputs
-  multiplierInputs.forEach(input => input.value = '');
+  multiplierInputs.forEach(input => {
+    input.value = '';
+    input.disabled = true;
+  });
   inputs.forEach(input => {
     input.value = '';
     input.classList.add('disabled');
@@ -2178,11 +2244,14 @@ updateCapitalDisplay();
 // Disable inputs initially
 inputs.forEach(inp => inp.classList.add('disabled'));
 
+// Disable multiplier inputs initially
+multiplierInputs.forEach(inp => inp.disabled = true);
+
 // Đảm bảo nút Play không nhấp nháy khi tải trang
 startBettingBtn.classList.remove('play-pulse');
 
 // Hiển thị thông báo hướng dẫn nhập vốn
-gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn ';
+gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn và mức cược để bắt đầu';
 gameStatusDisplay.classList.remove('play-prompt', 'warning', 'bet-prompt');
 gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
 gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
