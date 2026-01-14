@@ -998,6 +998,19 @@
     -moz-appearance: textfield;
     appearance: textfield;
   }
+
+  /* Hiệu ứng nhấp nháy cho cursor */
+  @keyframes cursorBlink {
+    0%, 100% { 
+      box-shadow: 0 0 5px rgba(96, 165, 250, 0.3);
+      border-color: rgba(96, 165, 250, 0.5);
+    }
+    50% { 
+      box-shadow: 0 0 20px rgba(96, 165, 250, 0.8), 0 0 30px rgba(96, 165, 250, 0.4);
+      border-color: #60a5fa;
+      transform: scale(1.02);
+    }
+  }
 </style>
 </head>
 <body>
@@ -2258,7 +2271,15 @@ gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
 gameStatusDisplay.style.color = '#e2e8f0';
 gameStatusDisplay.style.fontSize = '1.2em';
 
-// Focus vào ô input vốn ban đầu
+// Focus vào ô input vốn ban đầu với hiệu ứng nhấp nháy
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    initialCapitalInput.focus();
+    // Thêm hiệu ứng nhấp nháy cho cursor
+    initialCapitalInput.style.animation = 'cursorBlink 1s ease-in-out 3';
+  }, 500);
+});
+
 initialCapitalInput.focus();
 
 // Focus on first input after initialization
@@ -2267,7 +2288,6 @@ inputs[0].focus();
 
 </body>
 </html>
-
 
 
 
