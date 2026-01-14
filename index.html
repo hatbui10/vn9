@@ -888,8 +888,8 @@
 
   /* Class cho thông báo rộng 90% */
   .game-status.wide-notification {
-    width: 93%;
-    max-width: 93%;
+    width: 90%;
+    max-width: 90%;
     margin: 15px auto;
   }
 
@@ -1032,15 +1032,15 @@
   @keyframes insufficientFundsPulse {
     0%, 100% { 
       transform: scale(1); 
-      box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(185, 28, 28, 0.3));
-      border-color: #ef4444;
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(251, 191, 36, 0.3));
+      border-color: #f59e0b;
     }
     50% { 
       transform: scale(1.08); 
-      box-shadow: 0 0 45px rgba(239, 68, 68, 1);
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.5), rgba(185, 28, 28, 0.5));
-      border-color: #f87171;
+      box-shadow: 0 0 45px rgba(245, 158, 11, 1);
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.5), rgba(251, 191, 36, 0.5));
+      border-color: #fbbf24;
     }
   }
 </style>
@@ -1784,8 +1784,8 @@ function processBetting(autoInputVals, outputVals) {
   // Kiểm tra vốn còn đủ để cược không
   if (currentCapital < totalBet) {
     gameStatusDisplay.textContent = `💔 Vốn không đủ để cược! Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)}. Vui lòng reset game để tiếp tục!`;
-    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
-    gameStatusDisplay.style.border = '2px solid #ef4444';
+    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(251, 191, 36, 0.3))';
+    gameStatusDisplay.style.border = '2px solid #f59e0b';
     gameStatusDisplay.style.color = '#ffffff';
     gameStatusDisplay.classList.add('warning', 'insufficient-funds-pulse');
     bettingActive = false;
@@ -2167,7 +2167,7 @@ function processRandom() {
       inputs.forEach(i => i.value = "");
       inputs[0].focus();
       gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập 5 bit tiếp theo`;
-    }, 1000);
+    }, 1500);
   }
 }
 
@@ -2332,7 +2332,5 @@ inputs[0].focus();
 
 </body>
 </html>
-
-
 
 
