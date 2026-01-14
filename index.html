@@ -156,6 +156,9 @@
   #setCapital {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+  }
+
+  #setCapital.capital-button-pulse {
     animation: capitalButtonPulse 2s ease-in-out infinite;
   }
 
@@ -1672,6 +1675,9 @@ function setCapital() {
     gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
     gameStatusDisplay.style.color = '#f59e0b';
     
+    // Ngừng nhấp nháy nút nhập vốn
+    setCapitalBtn.classList.remove('capital-button-pulse');
+    
     // Enable multiplier inputs khi nhập vốn thành công
     multiplierInputs.forEach(inp => inp.disabled = false);
     
@@ -1694,6 +1700,9 @@ function setCapital() {
       gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
       gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
       gameStatusDisplay.style.color = '#f59e0b';
+      
+      // Ngừng nhấp nháy nút nhập vốn
+      setCapitalBtn.classList.remove('capital-button-pulse');
       
       addToBettingHistory(`Tăng vốn: +${formatCurrencyWithSeparator(capitalIncrease)} - Vốn mới: ${formatCurrencyWithSeparator(currentCapital)}`);
       addToHistory(`Capital increased by: ${formatCurrencyWithSeparator(capitalIncrease)}`);
@@ -2273,6 +2282,9 @@ document.getElementById('reset').addEventListener('click', () => {
   softReset();
   initState();
   
+  // Thêm lại class nhấp nháy cho nút nhập vốn
+  setCapitalBtn.classList.add('capital-button-pulse');
+  
   // Focus on first input
   inputs[0].focus();
 });
@@ -2291,6 +2303,9 @@ multiplierInputs.forEach(inp => inp.disabled = true);
 
 // Đảm bảo nút Play không nhấp nháy khi tải trang
 startBettingBtn.classList.remove('play-pulse');
+
+// Thêm class nhấp nháy cho nút nhập vốn khi tải trang
+setCapitalBtn.classList.add('capital-button-pulse');
 
 // Hiển thị thông báo hướng dẫn nhập vốn
 gameStatusDisplay.textContent = '💰 Vui lòng nhập vốn và mức cược để bắt đầu';
