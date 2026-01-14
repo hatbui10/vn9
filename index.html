@@ -1080,12 +1080,12 @@
   <div class="capital-section">
     <div class="section-title">
       <span class="icon">💰</span>
-      Tổng số Lương thực Hiện Tại
+      Tổng số Số lượng tên lửa Hiện Tại
     </div>
     <div class="capital-controls">
       <div class="capital-input-group">
-        <input type="text" id="initialCapital" placeholder="Nhập Lương thực ban đầu">
-        <button id="setCapital" class="btn-secondary">💰 Nhập Lương thực</button>
+        <input type="text" id="initialCapital" placeholder="Nhập Số lượng tên lửa ban đầu">
+        <button id="setCapital" class="btn-secondary">💰 Nhập Số lượng tên lửa</button>
       </div>
       <div class="capital-displays">
         <div>
@@ -1093,7 +1093,7 @@
           <div class="capital-display" id="currentCapital">0</div>
         </div>
         <div>
-          <div class="display-label">Lương Thực</div>
+          <div class="display-label">Số lượng tên lửa</div>
           <div class="profit-display" id="profitDisplay">0</div>
         </div>
       </div>
@@ -1623,7 +1623,7 @@ function updateCapitalDisplay() {
   }
   
   if (currentCapital <= 0) {
-    gameStatusDisplay.textContent = '💔 Hết Lương thực - BẠN ĐÃ XANH CỎ XIN CHÚC MỪNG!';
+    gameStatusDisplay.textContent = '💔 Hết tên lửa - BẠN ĐÃ XANH CỎ XIN CHÚC MỪNG!';
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
     bettingActive = false;
   }
@@ -1649,7 +1649,7 @@ function setCapital() {
   const capitalValue = parseInt(initialCapitalInput.value.replace(/[.,]/g, '')) || 10000000;
   
   if (capitalValue < 1000) {
-    gameStatusDisplay.textContent = '⚠️ Lương thực tối thiểu là 1,000';
+    gameStatusDisplay.textContent = '⚠️ Số lượng tên lửa tối thiểu là 1,000';
     gameStatusDisplay.classList.add('warning');
     setTimeout(() => {
       gameStatusDisplay.classList.remove('warning');
@@ -1668,7 +1668,7 @@ function setCapital() {
     updateCapitalDisplay();
     
     // Hiển thị thông báo thành công
-    gameStatusDisplay.textContent = `💰 Đã nhập Lương thực: ${formatCurrencyWithSeparator(capitalValue)} - Vui lòng nhập Số lượng tên lửa`;
+    gameStatusDisplay.textContent = `💰 Đã nhập Số lượng tên lửa: ${formatCurrencyWithSeparator(capitalValue)} - Vui lòng nhập Số lượng tên lửa`;
     gameStatusDisplay.classList.remove('warning');
     gameStatusDisplay.classList.add('bet-prompt', 'wide-notification');
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
@@ -1681,7 +1681,7 @@ function setCapital() {
     // Enable multiplier inputs khi nhập vốn thành công
     multiplierInputs.forEach(inp => inp.disabled = false);
     
-    addToBettingHistory(`Nhập Lương thực: ${formatCurrencyWithSeparator(capitalValue)}`);
+    addToBettingHistory(`Nhập Số lượng tên lửa: ${formatCurrencyWithSeparator(capitalValue)}`);
     addToHistory(`Capital set to: ${formatCurrencyWithSeparator(capitalValue)}`);
     
     // Focus ngay lập tức vào ô mức cược đầu tiên
@@ -1694,7 +1694,7 @@ function setCapital() {
       updateCapitalDisplay();
       
       // Hiển thị thông báo tăng vốn thành công
-      gameStatusDisplay.textContent = `💰 Đã tăng Lương thực: +${formatCurrencyWithSeparator(capitalIncrease)} - Vui lòng nhập số lượng Tên lửa`;
+      gameStatusDisplay.textContent = `💰 Đã tăng Số lượng tên lửa: +${formatCurrencyWithSeparator(capitalIncrease)} - Vui lòng nhập số lượng Tên lửa`;
       gameStatusDisplay.classList.remove('warning');
       gameStatusDisplay.classList.add('bet-prompt', 'wide-notification');
       gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
@@ -1704,22 +1704,22 @@ function setCapital() {
       // Ngừng nhấp nháy nút nhập vốn
       setCapitalBtn.classList.remove('capital-button-pulse');
       
-      addToBettingHistory(`Tăng Lương thực: +${formatCurrencyWithSeparator(capitalIncrease)} - Lương thực mới: ${formatCurrencyWithSeparator(currentCapital)}`);
+      addToBettingHistory(`Tăng Số lượng tên lửa: +${formatCurrencyWithSeparator(capitalIncrease)} - Số lượng tên lửa mới: ${formatCurrencyWithSeparator(currentCapital)}`);
       addToHistory(`Capital increased by: ${formatCurrencyWithSeparator(capitalIncrease)}`);
       
       // Focus ngay lập tức vào ô input mức cược đầu tiên
       document.getElementById('mult1').focus();
     } else if (capitalValue < currentCapital) {
       // Không cho phép giảm vốn khi đang chơi
-      gameStatusDisplay.textContent = '⚠️ Không thể giảm Lương thực khi đang chơi! Chỉ có thể tăng Lương thực.';
+      gameStatusDisplay.textContent = '⚠️ Không thể giảm Số lượng tên lửa khi đang chiến đấu! Chỉ có thể tăng Số lượng tên lửa.';
       gameStatusDisplay.classList.add('warning');
       setTimeout(() => {
         gameStatusDisplay.classList.remove('warning');
-        gameStatusDisplay.textContent = '🎮 Đang chiến đấu - Nhập 5 bit để bắt đầu';
+        gameStatusDisplay.textContent = '🎮 Đang chiến đấu - Nhập tọa độ để bắt đầu';
       }, 3000);
     } else {
       // Vốn không đổi
-      gameStatusDisplay.textContent = '💰 Lương thực không thay đổi - Vui lòng nhập số lượng Tên lửa';
+      gameStatusDisplay.textContent = '💰 Số lượng tên lửa không thay đổi - Vui lòng nhập số lượng Tên lửa';
       gameStatusDisplay.classList.remove('warning');
       gameStatusDisplay.classList.add('bet-prompt');
       gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
@@ -1736,7 +1736,7 @@ function startBetting() {
   // Parse giá trị từ input, loại bỏ dấu chấm
   const initialCapitalValue = parseInt(initialCapitalInput.value.replace(/\./g, '')) || 10000000;
   if (initialCapitalValue < 1000) {
-    gameStatusDisplay.textContent = '⚠️ Lương thực tối thiểu là 1,000';
+    gameStatusDisplay.textContent = '⚠️ Số lượng tên lửa tối thiểu là 1,000';
     gameStatusDisplay.classList.add('warning');
     setTimeout(() => {
       gameStatusDisplay.classList.remove('warning');
@@ -1764,13 +1764,13 @@ function startBetting() {
   
   // Tắt thông báo nhấp nháy và hiển thị trạng thái chơi
   gameStatusDisplay.classList.remove('play-prompt', 'warning');
-  gameStatusDisplay.textContent = '🎮 Đang chơi - Nhập 5 bit để bắt đầu';
+  gameStatusDisplay.textContent = '🎮 Đang chiến đấu - Nhập tọa độ để bắt đầu';
   gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))';
   gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
   gameStatusDisplay.style.color = '#e2e8f0';
   gameStatusDisplay.style.fontSize = '1.2em';
   
-  addToBettingHistory('Bắt đầu chơi với Lương thực: ' + formatCurrencyWithSeparator(currentCapital));
+  addToBettingHistory('Bắt đầu chiến đấu với Số lượng tên lửa: ' + formatCurrencyWithSeparator(currentCapital));
   addToHistory('Game started with capital: ' + formatCurrencyWithSeparator(currentCapital));
 }
 
@@ -1783,13 +1783,13 @@ function processBetting(autoInputVals, outputVals) {
   
   // Kiểm tra vốn còn đủ để cược không
   if (currentCapital < totalBet) {
-    gameStatusDisplay.textContent = `💔 Lương thực không đủ để chiến đấu! Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)}. Vui lòng reset game để vào vạch xuất phát!`;
+    gameStatusDisplay.textContent = `💔 Số lượng tên lửa không đủ để chiến đấu! Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)}. Vui lòng reset game để vào vạch xuất phát!`;
     gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(251, 191, 36, 0.3))';
     gameStatusDisplay.style.border = '2px solid #f59e0b';
     gameStatusDisplay.style.color = '#ffffff';
     gameStatusDisplay.classList.add('warning', 'insufficient-funds-pulse');
     bettingActive = false;
-    addToBettingHistory(`Hết Lương thực - Cần ${formatCurrencyWithSeparator(totalBet)} kg, hiện tại chỉ có ${formatCurrencyWithSeparator(currentCapital)} - Yêu cầu reset game trở về vạch xuất phát`, false);
+    addToBettingHistory(`Hết tên lửa rồi- Cần ${formatCurrencyWithSeparator(totalBet)} kg, hiện tại chỉ có ${formatCurrencyWithSeparator(currentCapital)} - Yêu cầu reset game trở về vạch xuất phát`, false);
     return;
   }
   
@@ -1820,7 +1820,7 @@ function processBetting(autoInputVals, outputVals) {
         console.log(`MATCH at position ${i + 1}! Win amount: ${winAmount}`);
         
         gameStatusDisplay.textContent = `🎉 Thắng! +${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Tiếp tục vòng ${currentBetRound + 1}`;
-        addToBettingHistory(`Thắng ${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Lương thực: ${formatCurrencyWithSeparator(currentCapital)} - Tiếp tục chiến đấu`, true);
+        addToBettingHistory(`Thắng ${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Số lượng tên lửa: ${formatCurrencyWithSeparator(currentCapital)} - Tiếp tục chiến đấu`, true);
         
         // KHÔNG dừng betting - tiếp tục chơi
         break;
@@ -1833,12 +1833,12 @@ function processBetting(autoInputVals, outputVals) {
         console.log(`NO MATCH at position ${i + 1}. Deducting: ${betAmount}`);
         
         gameStatusDisplay.textContent = `❌ Bit ${i + 1} không trùng - Trừ ${formatCurrencyWithSeparator(betAmount)} - Vòng ${currentBetRound}`;
-        addToBettingHistory(`Bit ${i + 1} không trùng - Trừ ${formatCurrencyWithSeparator(betAmount)} - Lương thực: ${formatCurrencyWithSeparator(currentCapital)}`, false);
+        addToBettingHistory(`Bit ${i + 1} không trùng - Trừ ${formatCurrencyWithSeparator(betAmount)} - Số lượng tên lửa: ${formatCurrencyWithSeparator(currentCapital)}`, false);
         
         // Kiểm tra hết vốn
         if (currentCapital <= 0) {
           bettingActive = false;
-          gameStatusDisplay.textContent = '💔 Hết Lương thực rồi - Đời là thế bạn ạ!';
+          gameStatusDisplay.textContent = '💔 Hết TÊN LỬA rồi - Đời là thế bạn ạ!';
           break;
         }
       }
@@ -1976,7 +1976,7 @@ function softReset() {
   
   // Hiển thị thông báo yêu cầu nhập vốn
   gameStatusDisplay.classList.remove('warning', 'play-prompt', 'bet-prompt');
-  gameStatusDisplay.textContent = '💰 Vui lòng nhập Lương thực để bắt đầu';
+  gameStatusDisplay.textContent = '💰 Vui lòng nhập Số lượng tên lửa để bắt đầu';
   gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
   gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
   gameStatusDisplay.style.color = '#e2e8f0';
@@ -2209,7 +2209,7 @@ multiplierInputs.forEach((input, index) => {
         startBettingBtn.classList.add('play-pulse');
         
         // Hiển thị thông báo bấm Play để bắt đầu chơi
-        gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU CHƠI!';
+        gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" để phóng Tên Lửa !';
         gameStatusDisplay.classList.remove('warning', 'bet-prompt');
         gameStatusDisplay.classList.add('play-prompt');
         gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.3))';
@@ -2270,7 +2270,7 @@ document.getElementById('reset').addEventListener('click', () => {
   autoOuts.forEach(output => output.value = '');
   
   // Reset game status
-  gameStatusDisplay.textContent = '💰 Vui lòng nhập Lương thực vào kho !!!';
+  gameStatusDisplay.textContent = '💰 Vui lòng nhập Số lượng tên lửa vào kho !!!';
   gameStatusDisplay.classList.remove('play-prompt', 'warning', 'bet-prompt', 'success-pulse', 'insufficient-funds-pulse', 'wide-notification');
   gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
   gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
@@ -2308,7 +2308,7 @@ startBettingBtn.classList.remove('play-pulse');
 setCapitalBtn.classList.add('capital-button-pulse');
 
 // Hiển thị thông báo hướng dẫn nhập vốn
-gameStatusDisplay.textContent = '💰 Vui lòng nhập Lương thực vào kho';
+gameStatusDisplay.textContent = '💰 Vui lòng nhập Số lượng tên lửa vào kho';
 gameStatusDisplay.classList.remove('play-prompt', 'warning', 'bet-prompt');
 gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
 gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
