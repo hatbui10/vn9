@@ -344,12 +344,58 @@
     display: none !important;
   }
   
+  /* Ẩn main-grid thứ hai (chứa statistics và operation history) */
+  .main-grid:nth-of-type(2) {
+    display: none !important;
+  }
+  
+  /* Ẩn tất cả các section sau main-grid đầu tiên */
+  .container > .main-grid:nth-of-type(2),
+  .container > .section:not(.capital-section):not(.game-info-section) {
+    display: none !important;
+  }
+  
+  /* Ẩn main-grid thứ hai và tất cả nội dung bên trong */
+  .container > .main-grid:nth-of-type(2),
+  .container > .main-grid:nth-of-type(2) > .section,
+  .container > .main-grid:nth-of-type(2) .stats-grid,
+  .container > .main-grid:nth-of-type(2) .history-panel {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+  
+  /* Ẩn cụ thể các phần không cần thiết */
+  .section:has(.rotor-grid),
+  .section:has(.stats-grid),
+  .section:has(.history-panel),
+  .section:has(#history) {
+    display: none !important;
+  }
+  
+  /* Ẩn TẤT CẢ các phần sau game-info-section */
+  .game-info-section ~ * {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+  }
+  
   /* Chỉ hiển thị 4 hộp chính */
   .capital-section,
   .game-info-section,
   .main-grid .section:nth-child(1),
   .main-grid .section:nth-child(2) {
     display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
   }
   
   /* Căn giữa 4 hộp chính */
