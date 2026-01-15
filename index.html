@@ -1283,6 +1283,7 @@ let currentBetRound = 0;
 let baseBetAmount = 1000;
 let roundProfit = 0; // Lãi của round hiện tại
 let profitThresholdReached = false; // Đã đạt ngưỡng lãi 20%
+let fromLuckyInputs = false; // Đánh dấu nguồn gọi processBetting
 
 // DOM elements
 const inputs = document.querySelectorAll(".in");
@@ -1710,16 +1711,33 @@ function processBetting(inputVals, outputVals) {
   
   updateCapitalDisplay();
   
-  // Auto clear lucky inputs for next round if still betting
-  if (bettingActive && currentCapital > 0) {
-    setTimeout(() => {
-      luckyInputs.forEach(i => {
-        i.value = "";
-        i.classList.remove('match');
-      });
-      luckyInputs[0].focus();
-      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập TỌA ĐỘ may mắn tiếp theo`;
-    }, 1500);
+  // Xử lý logic focus và reset theo nguồn gọi
+  if (bettingActive && fromLuckyInputs) {
+    // reset toàn bộ input
+    inputs.forEach(input => input.value = "");
+
+    // GIỮ LẠI 5 ô tọa độ, không reset ở đây
+    // luckyInputs.forEach(i => {
+    //   i.value = "";
+    //   i.classList.remove('match');
+    // });
+
+    // focus CHỈ 1 NƠI
+    inputs[0].focus();
+
+    fromLuckyInputs = false;
+  } else {
+    // KHÔNG reset tọa độ ở đây - chỉ reset khi gọi từ compute (sau khi nhập ô 5 input)
+    // if (bettingActive && currentCapital > 0) {
+    //   setTimeout(() => {
+    //     luckyInputs.forEach(i => {
+    //       i.value = "";
+    //       i.classList.remove('match');
+    //     });
+    //     luckyInputs[0].focus();
+    //     gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập TỌA ĐỘ may mắn tiếp theo`;
+    //   }, 1500);
+    // }
   }
   
   console.log('Final capital:', currentCapital, 'Betting active:', bettingActive, 'Round profit:', roundProfit);
@@ -1832,10 +1850,30 @@ function compute(encryptMode = true) {
   if (bettingActive && encryptMode && flipResult) {
     const finalBits = flipResult.result.split('');
     processBetting(vals, finalBits);
+    
+    // CHỈ reset tọa độ sau khi nhập ô 5 input
+    setTimeout(() => {
+      luckyInputs.forEach(i => {
+        i.value = "";
+        i.classList.remove('match');
+      });
+      luckyInputs[0].focus();
+      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập TỌA ĐỘ may mắn tiếp theo`;
+    }, 1500);
   } else if (bettingActive && !encryptMode) {
     // For decryption, use regular output
     const finalBits = out;
     processBetting(vals, finalBits);
+    
+    // CHỈ reset tọa độ sau khi nhập ô 5 input
+    setTimeout(() => {
+      luckyInputs.forEach(i => {
+        i.value = "";
+        i.classList.remove('match');
+      });
+      luckyInputs[0].focus();
+      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập TỌA ĐỘ may mắn tiếp theo`;
+    }, 1500);
   }
 }
 
@@ -1963,14 +2001,15 @@ inputs.forEach((inp, idx) => {
       return;
     }
     
-    // Reset lucky inputs before entering new input
-    if (idx === 0) {
-      luckyInputs.forEach(luckyInput => {
-        luckyInput.value = "";
-        luckyInput.classList.remove('match');
-      });
-    }
+    // KHÔNG reset lucky inputs khi nhập ô 1 - chỉ reset sau khi nhập ô 5 input
+    // if (idx === 0) {
+    //   luckyInputs.forEach(luckyInput => {
+    //     luckyInput.value = "";
+    //     luckyInput.classList.remove('match');
+    //   });
+    // }
     
+    // Auto-focus sang ô tiếp theo khi nhập xong
     if (idx < inputs.length - 1)
       inputs[idx + 1].focus();
     
@@ -2051,16 +2090,13 @@ luckyInputs.forEach((inp, idx) => {
     // Auto-trigger betting comparison when all 5 bits are entered
     if (idx === luckyInputs.length - 1 && inp.value !== "") {
       setTimeout(() => {
-        const luckyVals = Array.from(luckyInputs).map(input => input.value);
-        const outputVals = Array.from(outputs).map(output => output.value);
-        
-        // Only process if all outputs have values
+        const luckyVals = Array.from(luckyInputs).map(i => i.value);
+        const outputVals = Array.from(outputs).map(o => o.value);
+
         if (outputVals.every(val => val !== "")) {
+          fromLuckyInputs = true;      // 👈 ĐÁNH DẤU NGUỒN
           processBetting(luckyVals, outputVals);
         }
-        
-        // Focus back to first input field
-        inputs[0].focus();
       }, 100);
     }
   });
