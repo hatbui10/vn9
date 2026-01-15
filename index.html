@@ -282,7 +282,6 @@
   }
 }
 
-
   input.out {
     background: rgba(51, 65, 85, 0.8);
     color: #a78bfa;
@@ -951,7 +950,6 @@
     text-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
     position: relative;
     overflow: hidden;
-    width: 90%;
   }
 
   .game-status.success-pulse::before {
@@ -1102,7 +1100,7 @@
 
 <div class="container">
   <h1>🚀 CUỘC CHIẾN SINH TỬ 📡</h1>
-    <p class="subtitle">Hệ thống phòng thủ chiến lược đã vào vị trí sẵn sàng chiến đấu 🚀🚀🚀 📡📡📡 </p>
+    <p class="subtitle">Hệ thống phòng thủ đã kích hoạt sẵn sàng phản công toàn diện 🚀🚀🚀 📡📡📡 </p>
 
   <div class="control-panel">
     <div class="control-group">
@@ -1176,7 +1174,7 @@
       </div>
    
 <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 35px;">
-  <button id="startBetting" class="btn-primary play-pulse">🎮 Sãn sàng chiến đấu @_@</button>
+  <button id="startBetting" class="btn-primary play-pulse">🎮 Play</button>
    
 
   </div>
@@ -1486,7 +1484,7 @@ function updateCapitalDisplay() {
     // Hiển thị thông báo
     gameStatusDisplay.textContent = '🎉 Perfect!!!🎉 Perfect!!!🎉 Perfect!!! Hãy dừng lại đúng lúc - Tham lam là mất hết đấy @-@';
     gameStatusDisplay.classList.remove('play-prompt', 'warning');
-    gameStatusDisplay.classList.add('success-pulse');
+    gameStatusDisplay.classList.add('success-pulse', 'wide-notification');
     gameStatusDisplay.style.border = '3px solid #10b981';
     gameStatusDisplay.style.color = '#ffffff';
     gameStatusDisplay.style.fontSize = '1.4em';
@@ -2256,6 +2254,11 @@ if (inputs.length > 0 && !inputs[0].classList.contains('disabled')) {
 
 </body>
 </html>
+
+
+
+
+
 
 
 
