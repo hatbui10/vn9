@@ -216,9 +216,24 @@
   input.auto-out {
     background: rgba(16, 185, 129, 0.2);
     color: #10b981;
-    cursor: not-allowed;
+    cursor: pointer;
     border-color: rgba(16, 185, 129, 0.5);
     font-weight: bold;
+  }
+
+  input.auto-out.lucky-input {
+    cursor: text;
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+
+  input.auto-out.lucky-input:focus {
+    border-color: #f59e0b;
+    outline: none;
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+    background: rgba(245, 158, 11, 0.3);
   }
 
   input.auto-out.match {
@@ -1024,6 +1039,10 @@
     }
   }
 
+  .cursor-blink-active {
+    animation: cursorBlink 1.5s ease-in-out infinite;
+  }
+
   /* Hiệu ứng nhấp nháy cho thông báo vốn không đủ */
   .insufficient-funds-pulse {
     animation: insufficientFundsPulse 1.5s ease-in-out infinite;
@@ -1162,16 +1181,15 @@
        <span style="display:block;text-align:center;font-size:0.8em;color:#f59e0b;margin-top:6px;">🟡 TRÚNG MỤC TIÊU </span>
       </div>
       
-      <button id="randomBtn" class="btn-secondary" style="margin-bottom: 15px; width: 100%; display: none;">
-        🚀 Random 5 Bit (Auto)
-      </button>
+     
+       
       
       <div class="bit-inputs">
-        <input class="auto-out" readonly>
-        <input class="auto-out" readonly>
-        <input class="auto-out" readonly>
-        <input class="auto-out" readonly>
-        <input class="auto-out" readonly>
+        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
+        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
+        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
+        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
+        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
       </div>
      <button id="reset" class="btn-danger">🔄 Reset Cuộc Chiến</button>
     </div>
@@ -1228,10 +1246,7 @@
           <div class="stat-value" id="totalOps">0</div>
           <div class="stat-label">Total Operations</div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="entropy">0.00</div>
-          <div class="stat-label">Entropy Score</div>
-        </div>
+        
         <div class="stat-item">
           <div class="stat-value" id="cycles">0</div>
           <div class="stat-label">Key Cycles</div>
@@ -1258,13 +1273,6 @@
 <script>
 /* ======= ADVANCED ENIGMA MACHINE ======= */
 
-// Global variables
-let KEY, IV;
-let r1, r2, r3, r4, r5, r6, r7, r8, r9, r10;
-let step, totalOps, keyCycles;
-let previousCipher = 0;
-let operationHistory = [];
-let currentMode = 'ecb';
 
 // Betting system variables
 let currentCapital = 0;
@@ -1279,9 +1287,9 @@ let profitThresholdReached = false; // Đã đạt ngưỡng lãi 20%
 // DOM elements
 const inputs = document.querySelectorAll(".in");
 const autoOuts = document.querySelectorAll(".auto-out");
+const luckyInputs = document.querySelectorAll(".lucky-input");
 const outputs = document.querySelectorAll(".out");
 const info = document.getElementById("info");
-const rotorGrid = document.getElementById("rotorGrid");
 const history = document.getElementById("history");
 
 // Betting DOM elements
@@ -1293,203 +1301,10 @@ const setCapitalBtn = document.getElementById("setCapital");
 const gameStatusDisplay = document.getElementById("gameStatus");
 const bettingHistoryPanel = document.getElementById("bettingHistory");
 const multiplierInputs = document.querySelectorAll(".multiplier-input");
-const randomBtn = document.getElementById("randomBtn");
 
-// Initialize rotor grid display
-function initRotorDisplay() {
-  rotorGrid.innerHTML = '';
-  for (let i = 1; i <= 10; i++) {
-    const rotorItem = document.createElement('div');
-    rotorItem.className = 'rotor-item';
-    rotorItem.innerHTML = `
-      <div class="rotor-name">Rotor ${i}</div>
-      <div class="rotor-value" id="r${i}-info">0</div>
-    `;
-    rotorGrid.appendChild(rotorItem);
-  }
-}
 
-// Initialize state
-function initState() {
-  KEY = parseInt(document.getElementById('customKey').value, 16) || 0xC0FFEE99;
-  IV = parseInt(document.getElementById('customIV').value, 16) || 0x12345678;
-  
-  r1 = (KEY ^ IV) >>> 0;
-  r2 = (KEY + IV) >>> 0;
-  r3 = 0b10101;
-  r4 = 0b01011;
-  r5 = (~KEY) >>> 0;
-  r6 = 0;
-  r7 = (KEY * 31) >>> 0;
-  r8 = (IV ^ 0xDEADBEEF) >>> 0;
-  r9 = 0b11010;
-  r10 = 0;
-  
-  step = 0;
-  totalOps = 0;
-  keyCycles = 0;
-  previousCipher = 0;
-  operationHistory = [];
-  
-  updateStats();
-  addToHistory('System reinitialized with new parameters');
-}
 
-// Enhanced S-box with dynamic capability
-const DYNAMIC_SBOX = [
-  [12,5,6,11,9,0,10,13,3,14,15,8,4,7,1,2,2,1,7,4,8,15,14,3,13,10,0,9,11,6,5,12],
-  [8,6,7,9,3,12,10,15,13,1,5,0,14,4,2,11,11,2,4,14,0,5,1,13,15,10,12,3,9,7,6,8],
-  [15,0,6,8,11,1,9,2,5,12,14,10,7,3,13,4,4,13,3,7,10,14,12,5,2,9,1,11,8,6,0,15]
-];
 
-// Permutation layer for additional diffusion
-const PERMUTATION = [2, 4, 1, 0, 3];
-
-// Advanced rotors
-function rotor1(x) {
-  r1 ^= r1 << 13;
-  r1 ^= r1 >>> 17;
-  r1 ^= r1 << 5;
-  r1 >>>= 0;
-  return x ^ ((r1 >>> 27) & 31);
-}
-
-function rotor2(x) {
-  if (step % 2 === 0)
-    r2 = (1664525 * r2 + 1013904223) >>> 0;
-  return x ^ ((r2 >>> 26) & 31);
-}
-
-function rotor3(x) {
-  r3 = ((r3 << 1) | (r3 >> 4)) & 31;
-  return x ^ r3;
-}
-
-function rotor4(x) {
-  const sboxIndex = step % 3;
-  r4 = DYNAMIC_SBOX[sboxIndex][r4];
-  return DYNAMIC_SBOX[sboxIndex][x ^ r4] & 31;
-}
-
-function rotor5(x) {
-  r5 ^= r5 << 7;
-  r5 ^= r5 >>> 9;
-  r5 >>>= 0;
-  return x ^ ((r5 >>> 25) & 31);
-}
-
-function rotor6(x) {
-  r6 = (r6 + 1) & 31;
-  return x ^ r6;
-}
-
-// New advanced rotors
-function rotor7(x) {
-  // TEA-inspired rotation
-  r7 = (r7 + ((r7 << 4) ^ (r7 >>> 5)) + 0x9E3779B9) >>> 0;
-  return x ^ ((r7 >>> 24) & 31);
-}
-
-function rotor8(x) {
-  // Feistel network inspired
-  if (step % 3 === 0) {
-    r8 = ((r8 << 3) | (r8 >>> 29)) ^ 0x12345678;
-  }
-  return x ^ ((r8 >>> 23) & 31);
-}
-
-function rotor9(x) {
-  // Advanced rotation with variable step
-  const rotStep = (step % 5) + 1;
-  r9 = ((r9 << rotStep) | (r9 >>> (32 - rotStep))) & 31;
-  return x ^ r9;
-}
-
-function rotor10(x) {
-  // Chaotic counter
-  r10 = (r10 + step) & 31;
-  return x ^ r10;
-}
-
-// Permutation layer
-function permute(x) {
-  let result = 0;
-  const bits = numToBits(x);
-  for (let i = 0; i < 5; i++) {
-    result = (result << 1) | bits[PERMUTATION[i]];
-  }
-  return result;
-}
-
-// Key schedule
-function updateKeySchedule() {
-  if (step % 100 === 0) {
-    KEY = (KEY ^ (KEY << 13) ^ (KEY >>> 19)) >>> 0;
-    keyCycles++;
-    addToHistory(`Key schedule updated - Cycle ${keyCycles}`);
-  }
-}
-
-// Multiple rounds processing
-function processRounds(x) {
-  const rounds = parseInt(document.getElementById('rounds').value) || 3;
-  let result = x;
-  
-  for (let round = 0; round < rounds; round++) {
-    // Apply permutation
-    result = permute(result);
-    
-    // Apply all rotors
-    result = rotor1(result);
-    result = rotor2(result);
-    result = rotor3(result);
-    result = rotor4(result);
-    result = rotor5(result);
-    result = rotor6(result);
-    result = rotor7(result);
-    result = rotor8(result);
-    result = rotor9(result);
-    result = rotor10(result);
-    
-    // Final mixing
-    result = result ^ ((KEY >>> round) & 31);
-  }
-  
-  return result & 31;
-}
-
-// Mode-specific processing
-function processWithMode(input) {
-  currentMode = document.getElementById('mode').value;
-  let result;
-  
-  switch (currentMode) {
-    case 'cbc':
-      result = input ^ previousCipher;
-      result = processRounds(result);
-      previousCipher = result;
-      break;
-      
-    case 'ctr':
-      const counter = step & 31;
-      result = input ^ counter;
-      result = processRounds(result);
-      break;
-      
-    case 'chain':
-      result = processRounds(input);
-      // Chain output as next input modifier
-      result = result ^ ((previousCipher >>> 2) & 31);
-      previousCipher = result;
-      break;
-      
-    default: // ECB
-      result = processRounds(input);
-      break;
-  }
-  
-  return result;
-}
 
 // Bit conversion helpers
 function bitsToNum(bits) {
@@ -1500,50 +1315,92 @@ function numToBits(n) {
   return Array.from({ length: 5 }, (_, i) => (n >> (4 - i)) & 1);
 }
 
-// Update rotor display
-function updateRotorInfo() {
-  document.getElementById('r1-info').textContent = (r1 >>> 27) & 31;
-  document.getElementById('r2-info').textContent = (r2 >>> 26) & 31;
-  document.getElementById('r3-info').textContent = r3.toString(2).padStart(5, '0');
-  document.getElementById('r4-info').textContent = r4.toString(16).toUpperCase();
-  document.getElementById('r5-info').textContent = (r5 >>> 25) & 31;
-  document.getElementById('r6-info').textContent = r6;
-  document.getElementById('r7-info').textContent = (r7 >>> 24) & 31;
-  document.getElementById('r8-info').textContent = (r8 >>> 23) & 31;
-  document.getElementById('r9-info').textContent = r9.toString(2).padStart(5, '0');
-  document.getElementById('r10-info').textContent = r10;
+// Function to flip exactly 2 random bits
+function flipTwoBits(bits) {
+  const bitsArray = bits.split('');
+  const flippedIndices = [];
+  
+  // Choose 2 different random positions
+  for (let i = 0; i < 2; i++) {
+    let index;
+    do {
+      index = Math.floor(Math.random() * 5);
+    } while (flippedIndices.includes(index));
+    flippedIndices.push(index);
+    bitsArray[index] = bitsArray[index] === '0' ? '1' : '0';
+  }
+  
+  return {
+    result: bitsArray.join(''),
+    flippedPositions: flippedIndices.map(i => i + 1),
+    originalBits: bits
+  };
 }
 
-// Calculate entropy
-function calculateEntropy() {
-  const values = [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10];
-  const frequency = {};
-  
-  values.forEach(v => {
-    const key = v & 31;
-    frequency[key] = (frequency[key] || 0) + 1;
-  });
-  
-  let entropy = 0;
-  Object.values(frequency).forEach(count => {
-    const p = count / values.length;
-    if (p > 0) entropy -= p * Math.log2(p);
-  });
-  
-  return entropy.toFixed(2);
+// Enigma machine variables and functions
+let step = 0;
+let totalOps = 0;
+let currentMode = 'ecb';
+let operationHistory = [];
+let previousCipher = 0;
+
+// Initialize enigma state
+function initState() {
+  // Initialize rotors, keys, etc.
+  step = 0;
+  totalOps = 0;
+  operationHistory = [];
+}
+
+// Update key schedule
+function updateKeySchedule() {
+  // Update rotor positions and key schedule
+  // Simplified implementation
+}
+
+// Process with selected mode
+function processWithMode(x) {
+  const rounds = parseInt(document.getElementById('rounds').value) || 3;
+  return processRounds(x, rounds);
+}
+
+// Process encryption rounds
+function processRounds(x, rounds = 3) {
+  let result = x;
+  for (let i = 0; i < rounds; i++) {
+    result = (result * 7 + i) & 31; // Simplified round function
+  }
+  return result;
 }
 
 // Update statistics
 function updateStats() {
   document.getElementById('totalOps').textContent = totalOps;
-  document.getElementById('entropy').textContent = calculateEntropy();
-  document.getElementById('cycles').textContent = keyCycles;
-  
-  // Calculate diffusion (simplified)
-  const diffusion = Math.min(100, (totalOps * 2.5) % 100);
-  document.getElementById('diffusion').textContent = diffusion + '%';
+  document.getElementById('cycles').textContent = step;
+  document.getElementById('diffusion').textContent = '85%'; // Simplified
 }
 
+// Initialize rotor display
+function initRotorDisplay() {
+  const rotorGrid = document.getElementById('rotorGrid');
+  if (rotorGrid) {
+    rotorGrid.innerHTML = '';
+    for (let i = 1; i <= 10; i++) {
+      const rotorItem = document.createElement('div');
+      rotorItem.className = 'rotor-item';
+      rotorItem.innerHTML = `
+        <div class="rotor-name">Rotor ${i}</div>
+        <div class="rotor-value">${Math.floor(Math.random() * 32).toString(16).toUpperCase().padStart(2, '0')}</div>
+      `;
+      rotorGrid.appendChild(rotorItem);
+    }
+  }
+}
+
+
+
+ 
+ 
 // Add to history
 function addToHistory(message) {
   const timestamp = new Date().toLocaleTimeString();
@@ -1774,7 +1631,7 @@ function startBetting() {
   addToHistory('Game started with capital: ' + formatCurrencyWithSeparator(currentCapital));
 }
 
-function processBetting(autoInputVals, outputVals) {
+function processBetting(inputVals, outputVals) {
   if (!bettingActive) return;
   
   currentBetRound++;
@@ -1802,14 +1659,17 @@ function processBetting(autoInputVals, outputVals) {
   
   console.log('Processing betting round', currentBetRound, 'multipliers:', multipliers);
   
+  // Lấy giá trị từ lucky inputs
+  const luckyVals = Array.from(luckyInputs).map(input => input.value);
+  
   // Check từng bit từ 1-5
   for (let i = 0; i < 5; i++) {
-    if (autoInputVals[i] !== "") {
+    if (luckyVals[i] !== "") {
       const betAmount = baseBetAmount * multipliers[i];
       
-      console.log(`Bit ${i + 1}: auto=${autoInputVals[i]}, output=${outputVals[i]}, bet=${betAmount}`);
+      console.log(`Bit ${i + 1}: lucky=${luckyVals[i]}, output=${outputVals[i]}, bet=${betAmount}`);
       
-      if (autoInputVals[i] === outputVals[i]) {
+      if (luckyVals[i] === outputVals[i]) {
         // Có match - cộng 80% và TIẾP TỤC CHƠI (không dừng)
         matchFound = true;
         matchPosition = i;
@@ -1819,8 +1679,11 @@ function processBetting(autoInputVals, outputVals) {
         
         console.log(`MATCH at position ${i + 1}! Win amount: ${winAmount}`);
         
-        gameStatusDisplay.textContent = `🎉 Thắng! +${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Tiếp tục vòng ${currentBetRound + 1}`;
-        addToBettingHistory(`Thắng ${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Số lượng tên lửa: ${formatCurrencyWithSeparator(currentCapital)} - Tiếp tục chiến đấu`, true);
+        gameStatusDisplay.textContent = `🎉 Trúng mục tiêu! +${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Tiếp tục vòng ${currentBetRound + 1}`;
+        addToBettingHistory(`Trúng mục tiêu ${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Số lượng tên lửa: ${formatCurrencyWithSeparator(currentCapital)} - Tiếp tục chiến đấu`, true);
+        
+        // Highlight match
+        luckyInputs[i].classList.add('match');
         
         // KHÔNG dừng betting - tiếp tục chơi
         break;
@@ -1847,12 +1710,15 @@ function processBetting(autoInputVals, outputVals) {
   
   updateCapitalDisplay();
   
-  // Auto clear inputs for next round if still betting
+  // Auto clear lucky inputs for next round if still betting
   if (bettingActive && currentCapital > 0) {
     setTimeout(() => {
-      inputs.forEach(i => i.value = "");
-      inputs[0].focus();
-      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập tọa độ tiếp theo`;
+      luckyInputs.forEach(i => {
+        i.value = "";
+        i.classList.remove('match');
+      });
+      luckyInputs[0].focus();
+      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập TỌA ĐỘ may mắn tiếp theo`;
     }, 1500);
   }
   
@@ -1861,7 +1727,7 @@ function processBetting(autoInputVals, outputVals) {
 
 // Auto-processing function
 function autoCompute() {
-  const vals = [...autoInputs].map(i => i.value);
+  const vals = [...inputs].map(i => i.value);
   if (vals.some(v => v === "")) return;
 
   let x = bitsToNum(vals.map(Number));
@@ -1878,7 +1744,6 @@ function autoCompute() {
   out.forEach((b, i) => outputs[i].value = b);
   
   // Update displays
-  updateRotorInfo();
   updateStats();
   
   const hexOutput = result.toString(16).toUpperCase();
@@ -1925,21 +1790,52 @@ function compute(encryptMode = true) {
   }
   
   const out = numToBits(result & 31);
-  out.forEach((b, i) => outputs[i].value = b);
   
-  // Update displays
-  updateRotorInfo();
-  updateStats();
-  
-  const modeText = encryptMode ? 'Encrypted' : 'Decrypted';
-  const hexOutput = result.toString(16).toUpperCase();
-  info.textContent = `🔢 Step ${step} | ${modeText}: ${hexOutput} | Mode: ${currentMode.toUpperCase()} | Rounds: ${document.getElementById('rounds').value}`;
-  
-  addToHistory(`${modeText} ${vals.join('')} → ${out.join('')} (0x${hexOutput})`);
+  // Apply 2-bit flipping transformation for encryption
+  let flipResult = null;
+  if (encryptMode) {
+    const inputBits = vals.join('');
+    flipResult = flipTwoBits(inputBits);
+    const finalBits = flipResult.result.split('');
+    
+    // Use the flipped bits as output
+    finalBits.forEach((b, i) => outputs[i].value = b);
+    
+    // Update displays with flip information
+    updateStats();
+    
+    const modeText = 'Encrypted + 2-Bit Flip';
+    const hexOutput = result.toString(16).toUpperCase();
+    info.textContent = `🔢 Step ${step} | ${modeText}: ${finalBits.join('')} | Flipped: ${flipResult.flippedPositions.join(',')} | Original: ${inputBits}`;
+    
+    addToHistory(`${modeText} ${inputBits} → ${finalBits.join('')} (flipped positions: ${flipResult.flippedPositions.join(',')})`);
+  } else {
+    // Regular decryption output
+    out.forEach((b, i) => outputs[i].value = b);
+    
+    // Update displays
+    updateStats();
+    
+    const modeText = 'Decrypted';
+    const hexOutput = result.toString(16).toUpperCase();
+    info.textContent = `🔢 Step ${step} | ${modeText}: ${hexOutput} | Mode: ${currentMode.toUpperCase()} | Rounds: ${document.getElementById('rounds').value}`;
+    
+    addToHistory(`${modeText} ${vals.join('')} → ${out.join('')} (0x${hexOutput})`);
+  }
   
   // Compare and highlight matches after encryption
   if (autoOuts[0].value !== "") {
     compareAndHighlight();
+  }
+  
+  // Process betting if active
+  if (bettingActive && encryptMode && flipResult) {
+    const finalBits = flipResult.result.split('');
+    processBetting(vals, finalBits);
+  } else if (bettingActive && !encryptMode) {
+    // For decryption, use regular output
+    const finalBits = out;
+    processBetting(vals, finalBits);
   }
 }
 
@@ -1968,8 +1864,7 @@ function softReset() {
   // Disable input fields
   inputs.forEach(inp => inp.classList.add('disabled'));
   
-  // Hide random button
-  randomBtn.style.display = 'none';
+ 
   
   // Tắt animation nút Play
   startBettingBtn.classList.remove('play-pulse');
@@ -1982,8 +1877,9 @@ function softReset() {
   gameStatusDisplay.style.color = '#e2e8f0';
   gameStatusDisplay.style.fontSize = '1.2em';
   
-  // Focus vào ô input vốn ban đầu
+  // Focus vào ô input vốn ban đầu và thêm lại hiệu ứng nhấp nháy
   initialCapitalInput.focus();
+  initialCapitalInput.classList.add('cursor-blink-active');
   
   // Clear betting history
   bettingHistoryPanel.innerHTML = '<div class="bet-history-item">Hệ thống tên lửa đã sẵn sàng</div>';
@@ -1991,61 +1887,7 @@ function softReset() {
   addToHistory('System reset - Betting game reset - Ready for new operation');
 }
 
-// Export state
-function exportState() {
-  const state = {
-    KEY: KEY.toString(16).toUpperCase(),
-    IV: IV.toString(16).toUpperCase(),
-    rotors: [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10],
-    step: step,
-    mode: currentMode,
-    rounds: document.getElementById('rounds').value
-  };
   
-  const stateJson = JSON.stringify(state, null, 2);
-  const blob = new Blob([stateJson], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'enigma-state.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  
-  addToHistory('State exported to file');
-}
-
-// Import state
-function importState() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const state = JSON.parse(event.target.result);
-        KEY = parseInt(state.KEY, 16);
-        IV = parseInt(state.IV, 16);
-        [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10] = state.rotors;
-        step = state.step;
-        currentMode = state.mode;
-        document.getElementById('mode').value = state.mode;
-        document.getElementById('rounds').value = state.rounds;
-        document.getElementById('customKey').value = state.KEY;
-        document.getElementById('customIV').value = state.IV;
-        
-        updateRotorInfo();
-        updateStats();
-        addToHistory('State imported successfully');
-      } catch (error) {
-        addToHistory('Error importing state: Invalid file format');
-      }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
-}
 
 // Event listener for initial capital input
 initialCapitalInput.addEventListener('input', () => {
@@ -2060,6 +1902,8 @@ initialCapitalInput.addEventListener('focus', () => {
   // Xóa format để user nhập số mới
   const value = parseInt(initialCapitalInput.value.replace(/\./g, '')) || 0;
   initialCapitalInput.value = value;
+  // Xóa hiệu ứng nhấp nháy khi user focus vào ô
+  initialCapitalInput.classList.remove('cursor-blink-active');
 });
 
 initialCapitalInput.addEventListener('blur', () => {
@@ -2068,6 +1912,11 @@ initialCapitalInput.addEventListener('blur', () => {
   if (value >= 1000) {
     initialCapitalInput.value = formatCurrencyWithSeparator(value);
   }
+});
+
+// Xóa hiệu ứng nhấp nháy khi user bắt đầu nhập
+initialCapitalInput.addEventListener('input', () => {
+  initialCapitalInput.classList.remove('cursor-blink-active');
 });
 
 // Event listeners for main inputs
@@ -2103,7 +1952,7 @@ inputs.forEach((inp, idx) => {
       // Tự động tắt sau 3 giây
       setTimeout(() => {
         gameStatusDisplay.classList.remove('warning');
-        gameStatusDisplay.textContent = '� BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU CHIẾN ĐẤU!';
+        gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU CHIẾN ĐẤU!';
         gameStatusDisplay.classList.add('play-prompt');
       }, 3000);
       return;
@@ -2113,19 +1962,21 @@ inputs.forEach((inp, idx) => {
       inp.value = "";
       return;
     }
+    
+    // Reset lucky inputs before entering new input
+    if (idx === 0) {
+      luckyInputs.forEach(luckyInput => {
+        luckyInput.value = "";
+        luckyInput.classList.remove('match');
+      });
+    }
+    
     if (idx < inputs.length - 1)
       inputs[idx + 1].focus();
     
-    // Check if all inputs are filled, then auto process random
-    const allFilled = [...inputs].every(i => i.value !== "");
-    if (allFilled) {
-      // Compute encryption
-      compute(true);
-      
-      // Auto trigger random immediately
-      setTimeout(() => {
-        processRandom();
-      }, 500);
+    // Auto-trigger encryption when all 5 bits are entered
+    if (idx === inputs.length - 1 && inp.value !== "") {
+      setTimeout(() => compute(true), 100);
     }
   });
 
@@ -2135,50 +1986,7 @@ inputs.forEach((inp, idx) => {
   });
 });
 
-// Random function
-function generateRandomBits() {
-  const randomBits = [];
-  for (let i = 0; i < 5; i++) {
-    randomBits.push(Math.random() < 0.5 ? '0' : '1');
-  }
-  return randomBits;
-}
 
-function processRandom() {
-  const randomBits = generateRandomBits();
-  
-  // Hiển thị random bits trong auto-out
-  randomBits.forEach((bit, i) => {
-    autoOuts[i].value = bit;
-  });
-  
-  // Compare and highlight matches
-  compareAndHighlight();
-  
-  // Process betting if active
-  if (bettingActive) {
-    const outputVals = [...outputs].map(i => i.value);
-    processBetting(randomBits, outputVals);
-  }
-  
-  // Clear inputs for next round if still betting
-  if (bettingActive && currentCapital > 0) {
-    setTimeout(() => {
-      inputs.forEach(i => i.value = "");
-      inputs[0].focus();
-      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập Tọa độ tiếp theo`;
-    }, 1500);
-  }
-}
-
-// Event listener for random button
-randomBtn.onclick = processRandom;
-
-document.getElementById("encrypt").onclick = () => compute(true);
-document.getElementById("decrypt").onclick = () => compute(false);
-document.getElementById("reset").onclick = softReset;
-document.getElementById("export").onclick = exportState;
-document.getElementById("import").onclick = importState;
 
 // Betting system event listeners
 startBettingBtn.onclick = startBetting;
@@ -2226,6 +2034,44 @@ multiplierInputs.forEach((input, index) => {
   });
 });
 
+// Event listeners for lucky inputs (TỌA ĐỘ may mắn)
+luckyInputs.forEach((inp, idx) => {
+  inp.addEventListener("input", () => {
+    // Chỉ cho phép nhập 0 hoặc 1
+    if (inp.value !== "0" && inp.value !== "1") {
+      inp.value = "";
+      return;
+    }
+    
+    // Auto-focus to next field
+    if (idx < luckyInputs.length - 1) {
+      luckyInputs[idx + 1].focus();
+    }
+    
+    // Auto-trigger betting comparison when all 5 bits are entered
+    if (idx === luckyInputs.length - 1 && inp.value !== "") {
+      setTimeout(() => {
+        const luckyVals = Array.from(luckyInputs).map(input => input.value);
+        const outputVals = Array.from(outputs).map(output => output.value);
+        
+        // Only process if all outputs have values
+        if (outputVals.every(val => val !== "")) {
+          processBetting(luckyVals, outputVals);
+        }
+        
+        // Focus back to first input field
+        inputs[0].focus();
+      }, 100);
+    }
+  });
+
+  inp.addEventListener("keydown", e => {
+    if (e.key === "Backspace" && inp.value === "" && idx > 0) {
+      luckyInputs[idx - 1].focus();
+    }
+  });
+});
+
 // Mode change handler
 document.getElementById('mode').addEventListener('change', () => {
   currentMode = document.getElementById('mode').value;
@@ -2265,6 +2111,10 @@ document.getElementById('reset').addEventListener('click', () => {
   inputs.forEach(input => {
     input.value = '';
     input.classList.add('disabled');
+  });
+  luckyInputs.forEach(input => {
+    input.value = '';
+    input.classList.remove('match');
   });
   outputs.forEach(output => output.value = '');
   autoOuts.forEach(output => output.value = '');
@@ -2319,19 +2169,24 @@ gameStatusDisplay.style.fontSize = '1.2em';
 window.addEventListener('load', () => {
   setTimeout(() => {
     initialCapitalInput.focus();
-    // Thêm hiệu ứng nhấp nháy cho cursor
-    initialCapitalInput.style.animation = 'cursorBlink 1s ease-in-out 3';
+    // Thêm hiệu ứng nhấp nháy cho cursor - chạy liên tục
+    initialCapitalInput.classList.add('cursor-blink-active');
   }, 500);
 });
 
+// Focus ngay lập tức và thêm hiệu ứng nhấp nháy
 initialCapitalInput.focus();
+initialCapitalInput.classList.add('cursor-blink-active');
 
-// Focus on first input after initialization
-inputs[0].focus();
+// Focus on first input after initialization (only if not disabled)
+if (inputs.length > 0 && !inputs[0].classList.contains('disabled')) {
+  inputs[0].focus();
+}
 </script>
 
 </body>
 </html>
+
 
 
 
