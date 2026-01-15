@@ -237,18 +237,51 @@
   }
 
   input.auto-out.match {
-    background: rgba(251, 191, 36, 0.3);
-    color: #f59e0b;
-    border-color: rgba(251, 191, 36, 0.7);
-    box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
-    animation: matchPulse 1s ease-in-out;
-  }
+  background: linear-gradient(
+    135deg,
+    rgba(251, 191, 36, 0.85),
+    rgba(245, 158, 11, 0.95),
+    rgba(255, 215, 0, 0.9)
+  );
+  color: #1f1300;
+  border: 2px solid #fde68a;
 
-  @keyframes matchPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+  box-shadow:
+    0 0 12px rgba(251, 191, 36, 0.9),
+    0 0 25px rgba(245, 158, 11, 0.8),
+    0 0 45px rgba(255, 215, 0, 0.6);
+
+  animation:
+    matchPulse 0.9s ease-in-out infinite,
+    glowFlicker 1.6s linear infinite;
+
+  font-weight: 700;
+}
+
+/* Nhịp đập */
+@keyframes matchPulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.15); }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Ánh sáng nhấp nháy */
+@keyframes glowFlicker {
+  0%, 100% {
+    box-shadow:
+      0 0 12px rgba(251, 191, 36, 0.8),
+      0 0 30px rgba(245, 158, 11, 0.7),
+      0 0 55px rgba(255, 215, 0, 0.6);
   }
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 215, 0, 1),
+      0 0 45px rgba(251, 191, 36, 0.9),
+      0 0 80px rgba(255, 230, 120, 0.8);
+  }
+}
+
 
   input.out {
     background: rgba(51, 65, 85, 0.8);
@@ -2222,5 +2255,6 @@ if (inputs.length > 0 && !inputs[0].classList.contains('disabled')) {
 
 </body>
 </html>
+
 
 
