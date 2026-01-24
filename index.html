@@ -2,2258 +2,352 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Advanced Enigma Machine - 10 Rotors</title>
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+<title>Dãy nhị phân tự động</title>
 
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+<style>
+body {
+    margin: 0;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    color: #fff;
-  }
+    background: #001BB7;
+    font-family: "Courier New", monospace;
+}
 
-  .container {
-    background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 25px;
-    padding: 40px;
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
-    max-width: 1200px;
+.container {
+    background: #8b0000;
+    padding: 30px;
+    border-radius: 14px;
     width: 100%;
-    animation: fadeIn 0.8s ease-out;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
+    max-width: 950px;
+    text-align: center;
+}
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+h1 { color: #fff; }
 
- h1 {
-  text-align: center;
-  margin-bottom: 14px;
-  font-size: 3em;
-  font-weight: 800;
-  letter-spacing: 1px;
+.binary-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
 
-  color: #ffffff;
+.binary-display {
+    width: 120px;
+    height: 120px;
+    font-size: 80px;
+    font-weight: 900;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: red;
+    border-radius: 16px;
+    border: 4px solid #0d6efd;
+    color: #fff;
+}
 
-  text-shadow:
-    0 2px 8px rgba(0,0,0,0.7),
-    0 0 20px rgba(255,255,255,0.25);
+button {
+    padding: 12px 26px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-top: 20px;
+}
+#startBtn {
+    background: #198754;
+    color: #fff;
+}
+
+#resetBtn {
+    background: #ffc107;
+    margin-left: 10px;
 }
 
 
-
-
-  .subtitle {
-    text-align: center;
-    color: #94a3b8;
-    margin-bottom: 30px;
-    font-size: 1.1em;
-  }
-
-  .main-grid {
+.shift-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-bottom: 30px;
-  }
-
-  @media (max-width: 768px) {
-    .main-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .section {
-    background: rgba(30, 41, 59, 0.8);
-    border-radius: 20px;
-    padding: 25px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    backdrop-filter: blur(10px);
-  }
-
-  .section-title {
-    font-weight: 700;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.2em;
-    color: #e2e8f0;
-  }
-
-  .icon {
-    width: 24px;
-    height: 24px;
-    display: inline-block;
-  }
-
-  .bit-inputs {
-    display: flex;
-    gap: 12px;
+    grid-template-columns: repeat(4, 42px);
+    gap: 8px;
     justify-content: center;
-    flex-wrap: wrap;
-  }
+    margin-top: 10px;
+}
 
-  @media (max-width: 768px) {
-    .bit-inputs {
-      flex-wrap: nowrap;
-      gap: 8px;
-      padding: 0 10px;
-      justify-content: flex-start;
-    }
-  }
-
-  input {
-    width: 55px;
-    height: 55px;
-    text-align: center;
+.shift-cell {
+    height: 42px;
+    background: yellow;
+    color: #fff;
     font-size: 22px;
     font-weight: bold;
-    border: 2px solid rgba(148, 163, 184, 0.3);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    background: rgba(15, 23, 42, 0.8);
-    color: #60a5fa;
-  }
-
-  #initialCapital {
-    width: 200px;
-    height: 50px;
-    font-size: 18px;
-    padding: 0 15px;
-    cursor: text;
-    background: rgba(30, 41, 59, 0.9);
-    border: 2px solid rgba(96, 165, 250, 0.5);
-    color: #e2e8f0;
-  }
-
-  #initialCapital:focus {
-    border-color: #60a5fa;
-    outline: none;
-    box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
-    background: rgba(30, 41, 59, 1);
-  }
-
-  #setCapital {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-  }
-
-  #setCapital.capital-button-pulse {
-    animation: capitalButtonPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes capitalButtonPulse {
-    0%, 100% { 
-      transform: translateY(-2px) scale(1); 
-      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-    }
-    50% { 
-      transform: translateY(-2px) scale(1.05); 
-      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5);
-    }
-  }
-
-  @media (max-width: 768px) {
-    input.in {
-      width: 50px;
-      height: 50px;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-  }
-
-  input.in {
-    cursor: pointer;
-    border-color: rgba(96, 165, 250, 0.5);
-  }
-
-  input.in.disabled {
-    cursor: not-allowed !important;
-    background: rgba(51, 65, 85, 0.8);
-    border-color: rgba(148, 163, 184, 0.2);
-    color: #64748b;
-  }
-
-  .multiplier-input:disabled {
-    cursor: not-allowed !important;
-    background: rgba(51, 65, 85, 0.8);
-    border-color: rgba(148, 163, 184, 0.2);
-    color: #64748b;
-  }
-
-  .multiplier-input:not(:disabled) {
-    cursor: pointer;
-  }
-
-  input.in:focus {
-    border-color: #60a5fa;
-    outline: none;
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
-    background: rgba(30, 41, 59, 0.9);
-  }
-
-  input.auto-out {
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
-    cursor: pointer;
-    border-color: rgba(16, 185, 129, 0.5);
-    font-weight: bold;
-  }
-
-  input.auto-out.lucky-input {
-    cursor: text;
-    background: rgba(245, 158, 11, 0.2);
-    color: #f59e0b;
-    border-color: rgba(245, 158, 11, 0.5);
-  }
-
-  input.auto-out.lucky-input:focus {
-    border-color: #f59e0b;
-    outline: none;
-    transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-    background: rgba(245, 158, 11, 0.3);
-  }
-
-  input.auto-out.match {
-  background: linear-gradient(
-    135deg,
-    rgba(251, 191, 36, 0.85),
-    rgba(245, 158, 11, 0.95),
-    rgba(255, 215, 0, 0.9)
-  );
-  color: #1f1300;
-  border: 2px solid #fde68a;
-
-  box-shadow:
-    0 0 12px rgba(251, 191, 36, 0.9),
-    0 0 25px rgba(245, 158, 11, 0.8),
-    0 0 45px rgba(255, 215, 0, 0.6);
-
-  animation:
-    matchPulse 0.9s ease-in-out infinite,
-    glowFlicker 1.6s linear infinite;
-
-  font-weight: 700;
-}
-
-/* Nhịp đập */
-@keyframes matchPulse {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.15); }
-  60%  { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-/* Ánh sáng nhấp nháy */
-@keyframes glowFlicker {
-  0%, 100% {
-    box-shadow:
-      0 0 12px rgba(251, 191, 36, 0.8),
-      0 0 30px rgba(245, 158, 11, 0.7),
-      0 0 55px rgba(255, 215, 0, 0.6);
-  }
-  50% {
-    box-shadow:
-      0 0 20px rgba(255, 215, 0, 1),
-      0 0 45px rgba(251, 191, 36, 0.9),
-      0 0 80px rgba(255, 230, 120, 0.8);
-  }
-}
-
-  input.out {
-    background: rgba(51, 65, 85, 0.8);
-    color: #a78bfa;
-    cursor: not-allowed;
-    border-color: rgba(167, 139, 250, 0.5);
-  }
-
-  .control-panel {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
-  }
-
-  .control-group {
-    background: rgba(30, 41, 59, 0.6);
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-  }
-
-  .control-label {
-    font-size: 0.9em;
-    color: #94a3b8;
-    margin-bottom: 8px;
-    font-weight: 600;
-  }
-
-  select, input[type="number"], input[type="text"] {
-    width: 100%;
-    padding: 8px 12px;
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    border-radius: 8px;
-    color: #e2e8f0;
-    font-size: 14px;
-  }
-
-  select:focus, input[type="number"]:focus, input[type="text"]:focus {
-    outline: none;
-    border-color: #60a5fa;
-    box-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
-  }
-
-  .button-group {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin: 30px 0;
-    flex-wrap: wrap;
-  }
-
-  button {
-    font-size: 14px;
-    font-weight: 700;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s;
-  }
-
-  button:hover::before {
-    left: 100%;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-    color: white;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-  }
-
-  .btn-primary.play-pulse {
-    animation: playButtonPulse 1s ease-in-out infinite;
-    font-size: 16px;
-    padding: 14px 30px;
-    min-width: 150px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    border: 2px solid #f87171;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
-  }
-
-  @keyframes playButtonPulse {
-    0%, 100% { 
-      transform: scale(1); 
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.6);
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      border-color: #f87171;
-    }
-    50% { 
-      transform: scale(1.1); 
-      box-shadow: 0 12px 40px rgba(239, 68, 68, 0.9);
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-      border-color: #fca5a5;
-    }
-  }
-
-  .bet-prompt {
-    animation: betPromptPulse 1s ease-in-out infinite;
-    will-change: transform, opacity, filter;
-    backface-visibility: hidden;
-    transform: translateZ(0);
-  }
-
-  /* Ẩn các hộp không cần thiết */
-  .control-panel {
-    display: none !important;
-  }
-  
-  .process-flow {
-    display: none !important;
-  }
-  
-  .button-group {
-    display: none !important;
-  }
-  
-  #info {
-    display: none !important;
-  }
-  
-  .section:not(.capital-section):not(.game-info-section) {
-    display: none !important;
-  }
-  
-  /* Ẩn thêm statistics và operation history */
-  .section:has(.stat-item),
-  .section:has(#history),
-  .section:has(.stats-grid),
-  .section:has(.history-panel) {
-    display: none !important;
-  }
-  
-  /* Ẩn rotor states */
-  .section:has(.rotor-grid) {
-    display: none !important;
-  }
-  
-  /* Ẩn main-grid thứ hai (chứa statistics và operation history) */
-  .main-grid:nth-of-type(2) {
-    display: none !important;
-  }
-  
-  /* Ẩn tất cả các section sau main-grid đầu tiên */
-  .container > .main-grid:nth-of-type(2),
-  .container > .section:not(.capital-section):not(.game-info-section) {
-    display: none !important;
-  }
-  
-  /* Ẩn main-grid thứ hai và tất cả nội dung bên trong */
-  .container > .main-grid:nth-of-type(2),
-  .container > .main-grid:nth-of-type(2) > .section,
-  .container > .main-grid:nth-of-type(2) .stats-grid,
-  .container > .main-grid:nth-of-type(2) .history-panel {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    overflow: hidden !important;
-  }
-  
-  /* Ẩn cụ thể các phần không cần thiết */
-  .section:has(.rotor-grid),
-  .section:has(.stats-grid),
-  .section:has(.history-panel),
-  .section:has(#history) {
-    display: none !important;
-  }
-  
-  /* Ẩn TẤT CẢ các phần sau game-info-section */
-  .game-info-section ~ * {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important;
-    top: -9999px !important;
-    left: -9999px !important;
-  }
-  
-  /* Chỉ hiển thị 4 hộp chính */
-  .capital-section,
-  .game-info-section,
-  .main-grid .section:nth-child(1),
-  .main-grid .section:nth-child(2) {
-    display: block !important;
-    visibility: visible !important;
-    height: auto !important;
-    position: static !important;
-    top: auto !important;
-    left: auto !important;
-  }
-  
-  /* Căn giữa 4 hộp chính */
-  .main-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-  max-width: 90%;
-  margin: 0 auto;
-}
-  .capital-section {
-    grid-column: 1 / -1;
-    margin-bottom: 20px;
-  }
-
-  @keyframes betPromptPulse {
-    0%, 100% { 
-      opacity: 1;
-      transform: scale(1) translateY(0) translateZ(0);
-      text-shadow: 0 0 15px rgba(255, 0, 100, 1), 0 0 30px rgba(255, 0, 100, 0.8);
-      filter: brightness(1.2) saturate(1.5);
-      color: #ff0064;
-      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.6);
-    }
-    50% { 
-      opacity: 0.8;
-      transform: scale(1.1) translateY(-4px) translateZ(0);
-      text-shadow: 0 0 25px rgba(255, 0, 100, 1), 0 0 50px rgba(255, 0, 100, 0.8);
-      filter: brightness(1.6) saturate(2);
-      color: #ff0064;
-      box-shadow: 0 12px 40px rgba(245, 158, 11, 0.9);
-    }
-  }
-
-  .btn-secondary {
-    background: linear-gradient(135deg, #10b981, #06b6d4);
-    color: white;
-  }
-
-  .btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
-  }
-
-  .btn-danger {
-  background: linear-gradient(135deg, #ef4444, #f97316);
-  color: white;
-
-   font-size: 1em;
-  padding: 0.8em 1.4em;
-  
-  min-width: clamp(40px, 20vw, 100px);
-   line-height: 1.2;
-  padding: 0.8em 1.4em;
-  height: auto;
-  
-  border-radius: 10px;
-  border: 2px solid rgba(239, 68, 68, 0.5);
-  display: block;
-  margin: 40px auto 0;
-}
-
-  .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
-  }
-
-  #info {
-    text-align: center;
-    padding: 20px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-    border-radius: 15px;
-    font-family: 'Courier New', monospace;
-    font-weight: 600;
-    color: #e2e8f0;
-    margin: 20px 0;
-    border: 2px solid rgba(96, 165, 250, 0.3);
-    font-size: 1.1em;
-  }
-
-  .rotor-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-    margin-top: 20px;
-  }
-
-  .rotor-item {
-    text-align: center;
-    padding: 12px;
-    background: rgba(30, 41, 59, 0.8);
-    border-radius: 10px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  .rotor-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(96, 165, 250, 0.2);
-    border-color: rgba(96, 165, 250, 0.4);
-  }
-
-  .rotor-name {
-    font-weight: bold;
-    color: #60a5fa;
-    margin-bottom: 5px;
-    font-size: 0.9em;
-  }
-
-  .rotor-value {
-    font-family: 'Courier New', monospace;
-    color: #a78bfa;
-    font-size: 0.85em;
-  }
-
-  .history-panel {
-    max-height: 200px;
-    overflow-y: auto;
-    background: rgba(15, 23, 42, 0.8);
-    border-radius: 10px;
-    padding: 15px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-  }
-
-  .history-item {
-    padding: 8px;
-    margin: 5px 0;
-    background: rgba(30, 41, 59, 0.6);
-    border-radius: 8px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
-    color: #94a3b8;
-    border-left: 3px solid #60a5fa;
-  }
-
-  .process-flow {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin: 20px 0;
-    flex-wrap: wrap;
-  }
+    border-radius: 6px;
+}
 
-  .process-step {
-    padding: 8px 15px;
-    background: rgba(59, 130, 246, 0.2);
-    border: 1px solid rgba(96, 165, 250, 0.4);
-    border-radius: 20px;
-    font-size: 0.85em;
-    color: #60a5fa;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-  }
-
-  .arrow {
-    color: #a78bfa;
+.input-cell {
+    display: block;
+    font-size: 22px;
     font-weight: bold;
-  }
+    font-family: "Courier New", monospace;
 
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-  }
+    width: 42px;
+    height: 42px;
 
-  .stat-item {
+    background: #D6D85D;
+    color: #5C2FC2;
+
     text-align: center;
-    padding: 15px;
-    background: rgba(30, 41, 59, 0.6);
-    border-radius: 10px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-  }
+    caret-color: #000;
 
-  .stat-value {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #60a5fa;
-  }
+    border: 2px solid #0f0;
+    outline: none;
+}
 
-  .stat-label {
-    font-size: 0.85em;
-    color: #94a3b8;
-    margin-top: 5px;
-  }
 
-  .capital-section {
-    background: rgba(30, 41, 59, 0.8);
-    border-radius: 20px;
-    padding: 20px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    margin-bottom: 20px;
-    text-align: center;
-  }
-
-  .capital-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-top: 15px;
-  }
-
-  @media (max-width: 768px) {
-    .capital-controls {
-      flex-direction: column;
-      gap: 15px;
-      align-items: stretch;
-    }
-
-    .capital-input-group {
-      order: 1;
-    }
-
-    .capital-displays {
-      order: 2;
-      flex-direction: column;
-      gap: 10px;
-    }
-  }
-
-  .capital-input-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-  }
-
-  @media (max-width: 768px) {
-    .capital-input-group {
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .capital-input-group input {
-      width: 100%;
-      max-width: 300px;
-    }
-
-    #startBetting {
-      width: 100%;
-      max-width: 200px;
-      margin-bottom: 35px;
-    }
-  }
-
-  .capital-input-group input {
-    width: 200px;
+.sequence-display {
+    margin-top: 25px;
+    background: #0046FF;
     padding: 10px;
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(148, 163, 184, 0.3);
-    border-radius: 8px;
-    color: #e2e8f0;
-    font-size: 16px;
-  }
-
-  .capital-displays {
-    display: flex;
-    gap: 15px;
-    align-items: flex-start;
-  }
-
-  @media (max-width: 768px) {
-    .capital-displays {
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .capital-displays > div {
-      width: 100%;
-    }
-
-    .capital-display, .profit-display {
-      width: 100%;
-      min-width: auto;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-  }
-
-  .capital-displays > div {
-    flex: 1;
-  }
-
-  .display-label {
-    font-size: 0.9em;
-    color: #94a3b8;
-    text-align: center;
-    margin-bottom: 5px;
-    font-weight: 600;
-  }
-
-  .capital-display {
-    font-size: 2em;
-    font-weight: bold;
-    color: #10b981;
-    text-align: center;
-    padding: 15px;
-    background: rgba(16, 185, 129, 0.1);
-    border-radius: 12px;
-    border: 2px solid rgba(16, 185, 129, 0.3);
-    min-width: 200px;
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .profit-display {
-    font-size: 2em;
-    font-weight: bold;
-    color: #f59e0b;
-    text-align: center;
-    padding: 15px;
-    background: rgba(245, 158, 11, 0.1);
-    border-radius: 12px;
-    border: 2px solid rgba(245, 158, 11, 0.3);
-    min-width: 200px;
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .profit-display.positive {
-    color: #10b981;
-    background: rgba(16, 185, 129, 0.1);
-    border-color: rgba(16, 185, 129, 0.3);
-  }
-
-  .profit-display.negative {
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.3);
-  }
-
-  .input-betting-section {
-    margin-bottom: 20px;
-  }
-
-  .output-section, .auto-input-section {
-    margin-bottom: 20px;
-  }
-
-  .game-info-section {
-    margin-bottom: 30px;
-  }
-
-  .multiplier-inputs {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    margin-bottom: 20px;
-  }
-
-  .multiplier-input {
-    width: 50px;
-    height: 38px;
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    border: 2px solid rgba(148, 163, 184, 0.3);
-    border-radius: 8px;
-    background: rgba(15, 23, 42, 0.8);
-    color: #f59e0b;
-    transition: all 0.3s ease;
-  }
-
-  .multiplier-input:focus {
-    border-color: #f59e0b;
-    outline: none;
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
-  }
-
-  #startBetting {
-    margin-bottom: 35px;
-  }
-
-  .x1000-display {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #ef4444;
-    margin-left: 10px;
-    padding: 8px 15px;
-    background: rgba(239, 68, 68, 0.2);
-    border-radius: 8px;
-    border: 1px solid rgba(239, 68, 68, 0.4);
-  }
-
-  .betting-history {
-    max-height: 150px;
+    display: grid;
+    grid-template-columns: repeat(30, 26px);
+    gap: 4px;
+    max-height: 300px;
     overflow-y: auto;
-    background: rgba(15, 23, 42, 0.8);
-    border-radius: 10px;
-    padding: 15px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    margin-top: 15px;
-  }
-
-  .bet-history-item {
-    padding: 8px;
-    margin: 5px 0;
-    background: rgba(30, 41, 59, 0.6);
-    border-radius: 8px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
-    border-left: 3px solid #f59e0b;
-  }
-
-  .bet-history-item.win {
-    border-left-color: #10b981;
-    background: rgba(16, 185, 129, 0.1);
-  }
-
-  .bet-history-item.lose {
-    border-left-color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-  }
-
-  .game-status {
+}
+/* ô đứng im màu đỏ nền trắng*/
+.sequence-bit {
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
     text-align: center;
-    padding: 20px;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1));
-    border-radius: 12px;
-    font-weight: bold;
-    margin: 15px 0;
-    border: 2px solid rgba(245, 158, 11, 0.3);
-    font-size: 1.2em;
-    transition: all 0.3s ease;
-    width: auto;
-    max-width: 100%;
-  }
-
-  /* Class cho thông báo rộng 90% */
-  .game-status.wide-notification {
-    width: 90%;
-    max-width: 90%;
-    margin: 15px auto;
-  }
-
-  .game-status.success-pulse {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.4));
-    border: 3px solid #10b981;
-    color: #ffffff;
-    font-size: 1.4em;
-    animation: successPulse 1.2s ease-in-out infinite;
-    box-shadow: 0 0 40px rgba(16, 185, 129, 0.8);
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .game-status.success-pulse::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    animation: shimmer 2s linear infinite;
-  }
-
-  @keyframes successPulse {
-    0%, 100% { 
-      transform: scale(1); 
-      box-shadow: 0 0 40px rgba(16, 185, 129, 0.8);
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(5, 150, 105, 0.4));
-    }
-    25% { 
-      transform: scale(1.05); 
-      box-shadow: 0 0 60px rgba(16, 185, 129, 1);
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.6), rgba(5, 150, 105, 0.6));
-    }
-    50% { 
-      transform: scale(1.08); 
-      box-shadow: 0 0 80px rgba(16, 185, 129, 1.2);
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.7), rgba(5, 150, 105, 0.7));
-    }
-    75% { 
-      transform: scale(1.05); 
-      box-shadow: 0 0 60px rgba(16, 185, 129, 1);
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.6), rgba(5, 150, 105, 0.6));
-    }
-  }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-  }
-
-  .game-status.play-prompt {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.3));
-    border: 3px solid #3b82f6;
-    color: #ffffff;
-    font-size: 1.3em;
-    animation: playPromptPulse 1s ease-in-out infinite;
-    box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-  }
-
-  @keyframes warningPulse {
-    0%, 100% { 
-      transform: scale(1); 
-      box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(185, 28, 28, 0.3));
-    }
-    50% { 
-      transform: scale(1.08); 
-      box-shadow: 0 0 50px rgba(239, 68, 68, 0.8);
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.5), rgba(185, 28, 28, 0.5));
-    }
-  }
-
-  @keyframes playPromptPulse {
-    0%, 100% { 
-      transform: scale(1); 
-      box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.3));
-    }
-    50% { 
-      transform: scale(1.06); 
-      box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(29, 78, 216, 0.5));
-    }
-  }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(30, 41, 59, 0.8);
+    background: red;
+     color: #fff; 
+    
+     font-weight: 900;   /* hoặc 800, 700 */
     border-radius: 4px;
-  }
+}
+/* ô đứng im màu dỏ nền vàng*/
+.sequence-bit.current {
+    background: #3120E0;
+    color: #000000;
+    opacity: 1;
+}
 
-  ::-webkit-scrollbar-thumb {
-    background: rgba(96, 165, 250, 0.5);
-    border-radius: 4px;
-  }
+.sequence-bit.mismatch {
+    background: #5B23FF;
+    color: #fff;
+    opacity: 1;
+}
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(96, 165, 250, 0.7);
-  }
-
-  /* Xóa mũi tên trong ô input type="number */
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    appearance: none;
-    margin: 0;
-  }
-  
-  input[type="number"] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-
-  /* Hiệu ứng nhấp nháy cho cursor */
-  @keyframes cursorBlink {
-    0%, 100% { 
-      box-shadow: 0 0 5px rgba(96, 165, 250, 0.3);
-      border-color: rgba(96, 165, 250, 0.5);
-    }
-    50% { 
-      box-shadow: 0 0 20px rgba(96, 165, 250, 0.8), 0 0 30px rgba(96, 165, 250, 0.4);
-      border-color: #60a5fa;
-      transform: scale(1.02);
-    }
-  }
-
-  .cursor-blink-active {
-    animation: cursorBlink 1.5s ease-in-out infinite;
-  }
-
-  /* Hiệu ứng nhấp nháy cho thông báo vốn không đủ */
-  .insufficient-funds-pulse {
-    animation: insufficientFundsPulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes insufficientFundsPulse {
-    0%, 100% { 
-      transform: scale(1); 
-      box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(251, 191, 36, 0.3));
-      border-color: #f59e0b;
-    }
-    50% { 
-      transform: scale(1.08); 
-      box-shadow: 0 0 45px rgba(245, 158, 11, 1);
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.5), rgba(251, 191, 36, 0.5));
-      border-color: #fbbf24;
-    }
-  }
+.status {
+    margin-top: 25px;
+    color: #f8f9fa;
+}
 </style>
 </head>
+
 <body>
-
 <div class="container">
-  <h1>🚀 CUỘC CHIẾN SINH TỬ 📡</h1>
-    <p class="subtitle">Hệ thống phòng thủ đã kích hoạt sẵn sàng phản công toàn diện 🚀🚀🚀 📡📡📡 </p>
+<h1>Bit lucky @-@ là :</h1>
 
-  <div class="control-panel">
-    <div class="control-group">
-      <div class="control-label">🔧 Encryption Mode</div>
-      <select id="mode">
-        <option value="ecb">ECB (Electronic Codebook)</option>
-        <option value="cbc">CBC (Cipher Block Chaining)</option>
-        <option value="ctr">CTR (Counter)</option>
-        <option value="chain">Chain Mode</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <div class="control-label">🔄 Rounds</div>
-      <input type="number" id="rounds" min="1" max="10" value="3">
-    </div>
-    <div class="control-group">
-      <div class="control-label">🔑 Key (Hex)</div>
-      <input type="text" id="customKey" value="C0FFEE99" maxlength="8">
-    </div>
-    <div class="control-group">
-      <div class="control-label">📊 IV (Hex)</div>
-      <input type="text" id="customIV" value="12345678" maxlength="8">
-    </div>
-  </div>
-
-  
-  <!-- Capital Display Section -->
-  <div class="capital-section">
-    <div class="section-title">
-      <span class="icon">💰</span>
-      Tổng số tên lửa trong kho bí mật
-    </div>
-    <div class="capital-controls">
-      <div class="capital-input-group">
-        <input type="text" id="initialCapital" placeholder="Nhập Số lượng tên lửa ban đầu">
-        <button id="setCapital" class="btn-secondary">💰 Nhập Số lượng tên lửa</button>
-      </div>
-      <div class="capital-displays">
-        <div>
-          <div class="display-label">Trong kho còn</div>
-          <div class="capital-display" id="currentCapital">0</div>
-        </div>
-        <div>
-          <div class="display-label">Số lượng tên lửa</div>
-          <div class="profit-display" id="profitDisplay">0</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
- <div class="game-status" id="gameStatus">
-      🎯 Sẵn sàng phóng Tên Lửa - Nhập tọa độ để bắt đầu
-    </div>
-
-  <!-- Input and Betting Section -->
-  <div class="main-grid">
-    <div class="section">
-    
-     <div class="section-title" style="margin: 20px;">
-        <span class="icon">🚀</span>
-        Tọa độ tên lửa (x1000)
-      </div>
-      <div class="multiplier-inputs">
-        <input type="number" class="multiplier-input" id="mult1" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult2" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult3" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult4" inputmode="numeric">
-        <input type="number" class="multiplier-input" id="mult5" inputmode="numeric">
-      </div>
-   
-<div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 35px;">
-  <button id="startBetting" class="btn-primary play-pulse">🎮 Play</button>
-   
-
-  </div>
-        
-      <div class="section-title">
-        <span class="icon">📡</span>
-       Nhập tọa độ mục tiêu:
-      </div>
-      
-      <div class="bit-inputs">
-        <input class="in" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-        <input class="in" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-        <input class="in" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-        <input class="in" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-        <input class="in" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-      </div>
-       </div>
-
-     
-    <div class="section">
-      <div class="section-title">
-        <span class="icon">📡</span>
-       Tọa độ đã mã hóa
-      </div>
-      <div class="bit-inputs">
-        <input class="out" readonly>
-        <input class="out" readonly>
-        <input class="out" readonly>
-        <input class="out" readonly>
-        <input class="out" readonly>
-      </div>
-      
-      <div class="section-title" style="margin-top: 20px;">
-        <span class="icon">🔄</span>
-      TỌA ĐỘ may mắn
-       <span style="display:block;text-align:center;font-size:0.8em;color:#f59e0b;margin-top:6px;">🟡 TRÚNG MỤC TIÊU </span>
-      </div>
-      
-     
-       
-      
-      <div class="bit-inputs">
-        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-        <input class="auto-out lucky-input" maxlength="1" placeholder="0/1" inputmode="numeric" pattern="[01]">
-      </div>
-     <button id="reset" class="btn-danger">🔄 Reset Cuộc Chiến</button>
-    </div>
-    
-  </div>
-
-  <!-- Game Status and History -->
-  <div class="game-info-section">
-       
-    <div class="betting-history" id="bettingHistory">
-      <div class="bet-history-item">Hệ thống tên lửa 28 SARMART đã sẵn sàng</div>
-    </div>
-  </div>
-
-  <div class="process-flow" id="processFlow">
-    <div class="process-step">Input</div>
-    <span class="arrow">→</span>
-    <div class="process-step">Permutation</div>
-    <span class="arrow">→</span>
-    <div class="process-step">Rotor 1-10</div>
-    <span class="arrow">→</span>
-    <div class="process-step">Final Mix</div>
-    <span class="arrow">→</span>
-    <div class="process-step">Output</div>
-  </div>
-
-  <div class="button-group">
-       <button id="encrypt" class="btn-primary">🔐 Encrypt</button>
-    <button id="decrypt" class="btn-secondary">🔓 Decrypt</button>
-        <button id="export" class="btn-primary">💾 Export State</button>
-    <button id="import" class="btn-secondary">📂 Import State</button>
-  </div>
-
-  <div id="info">Advanced Enigma Ready - 10 Rotors Active</div>
-
-  <div class="section">
-    <div class="section-title">
-      <span class="icon">⚙️</span>
-      Rotor States (Real-time)
-    </div>
-    <div class="rotor-grid" id="rotorGrid">
-      <!-- Rotor states will be populated here -->
-    </div>
-  </div>
-
-  <div class="main-grid">
-    <div class="section">
-      <div class="section-title">
-        <span class="icon">📈</span>
-        Statistics
-      </div>
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-value" id="totalOps">0</div>
-          <div class="stat-label">Total Operations</div>
-        </div>
-        
-        <div class="stat-item">
-          <div class="stat-value" id="cycles">0</div>
-          <div class="stat-label">Key Cycles</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="diffusion">0%</div>
-          <div class="stat-label">Diffusion Rate</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">
-        <span class="icon">📜</span>
-        Operation History
-      </div>
-      <div class="history-panel" id="history">
-        <div class="history-item">System initialized - Advanced Enigma ready</div>
-      </div>
-    </div>
-  </div>
+<div class="binary-row">
+    <div class="binary-display" id="binaryPrev">-</div>
+    <div class="binary-display" id="binaryNow">-</div>
 </div>
 
+<div class="shift-row">
+   
+    <div class="shift-cell">-</div>
+    <div class="shift-cell">-</div>
+    <div class="shift-cell">-</div>
+    <input class="shift-cell input-cell" id="inputCell" maxlength="1">
+</div>
+ <div class="controls">
+        <button id="startBtn">Bắt đầu</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+
+   
+
+
+<div class="status" id="status">READY</div>
+
+<div class="sequence-display" id="sequenceDisplay">
+00010001010001000011011101010110100110000000101101000000000011110110101001100000111100110011110110111000000001100100101110101011001000010010100110010011101011101000011100001100100110111011010001111100001001101100010001101010101010000000010111110010010110001000010100100010010111001001010101000110111110001010110100101000101101000100101101101000110101011110001000010011100101101011011001001110111111101110011110101010000000001000100101001100010110110000110111101000001000001110111110110011011010000111
+01010111111111011001001010100011111010111000100100010111100100000111000100001100000110111110011011110100000110010111010001111011001010000100010001011100101111010011011101110111110011010010011110110001001110111101110011001001101011000111101110110001101000110111100011100110001000000111111000111001101111100011001000001011001011010011111110011111111010111111100111010000000010011001111000000101100001110101011000001010110000111001011001010110011011110100011001000010011111101101001000111010000010101110
+11111111011000111111000001000100001110100011001100001001001100111001100011000001111110000110111000110010010000010101010000110000101010110111100110000100100111000001110001001101010000101111100100101110010100100000111011111011110110010000000100100101101100010100110101011010110010101010010111111111010111000000110110111001101010011111001101100001001100100100111100100010111010011100011100000111110111011011111110101000110101001100101010100001001010101000000101100011111000111110010010000111000100011001
+10001110100010010110010000110100001001111100111011001001111101011111101011010111011111111011011101100001101011101011100010011011001100000001100011101110101100011111001010001000111001100011101110101101110110100011110111001000000111011011001111100001111000010101000110001110101001011100000011011000011011111100000110110001011001011101010011111110101111101000110110101010101010111011100110000010011111001100011000101100010100110010111001110101111000100100111000111000111111111001101011000111101101110000
+11110010110000001010010001010011110000001000100100000010111011000011001101111000110011110010011010111111111111011110011101101010001011110101011100010000110000111010000001100111000010100100010110101000100100001100010010011101111110111011100010011010100110010111010101111100000001110011001100000001011100111110010111001000101101010110011000001111010111000011101011100101100111101101001010010011101100111001111110011111100101110100001000010110100011101000010010111101011100110101011011101001000110001111
+01100000000000000111101001100101010100001100111010001001000111001110110111111111110000110100110000001100110100111100001001000100001011000110101011101011001100001010111100001011101111111110100110000110100011001110010100010001111011010100010000011111001101110001001101000001000101000101111100000000010100001100111001100110100011001101101010111111000001101000111001100100111110110001100000100100000000000110100011001001110011000000101111001011001110010000100110111000001001001101100100101011000100100110
+10011100000111110011100010010111011011110110001111100101010011100110011111100010000101111010010011000100100001000011001010101010001101101010100001101011000010010110001010111000000000001111011011110010101100110000011000010001110000100100000001011111101010010000010111010100010001001011100010000100110111011100001101101100010100001101101110111010101010101001110011010110000011110101111000110111100101100010100001001100101101000000000011000111101000110010101000010100000000100001000001110011110011110111
+00010111100101101111010010100100001110101001011011101001000100000111100000111111000011000000000101001110010001101101001011100100001011001101010110100100110111001000011001011100110001011100000111001000000111000101000001100100000110111101101110111101100110000000111110000100101110010110100100110010110101110001101011111100001111111000000001101000011110011101010111001000001001011011110110101101101001001111010001000111110100001001111101111110101100001010001110101010001111110000011010101110010101011010
+01011000100000111100000111111000011000000000101001110010001101101001011100100001011001101010110100100110111001000011001011100110001011100000111001000000111000101000001100100000110111101101110111101100110000000111110000100101110010110100100110010110101110001101011111100001111111000000001101000011110011101010111001000001001011011110110101101101001001111010001000111110100001001111101111110101100001010001110101010001111110000011010101110010101011010010110000100011000111101110110010011111011111000100
+10110001110010100110101010011001001101010101001000100010110110001010100100101110010110000000010000111010111000010000010110010111001101001011101011001010011100001111101011111001111111111000110101100001001101010101001101011111001000010011011001011010100001111011100001100001101011011000000111101111010111110011001011100000100011100010111100111101101000010100011011101101000010010010100111001001100101101111011111110101000101101011111011101000100111111101011000100111111011101100100110110110010100100010
+10110100101001000100111000001000001001101100101100011000000110110101111010100010111000001011101001001110011011100111101000010000100101011011001010011001110001001111111110101001110001101001010011101001101010111001001111111110101000001100000100110011011110111000010011110001000101111101001110001111001110011110100111011011000010011000101100010101111110011010011000100100001111010010100001110110000001101101001011010100001101111111111011000001001010101101000101110011101000011011101111100001110111101000
+10110011100100000001001110100001101110000011000111101110000011001010101001110111011011011111001001011001111000000100110111100010001100111100001011011110110010010100100111001100110001100110110111000000100010001001101111111101001110111011011001101111110000101010000000001110110101101001110111010010100010100111101010011101001110100010011100101000001110101010101111100001010100110010100101100101010010011100101011110011100001011010010111010010100100010010111111011110011011001111100010110101010010101001
+11111101101111011010111101101001010011110100011000000111011101010110001001011010100011110011110110010100001110111100010001001110100000101000111100101100011001011001101010010111111011000111000011011100110001011100011110001011101000011010010100000100111110001011101001000010000010111100111101010101100010100000010100010100101011011110001110010100011011100011100111101101001111001111010011100101101101110001101000001010000000001000000011010110110001011011000011010000010111011011000011011100111011001010
+00011110111111010100000010000011101010100010001100110011100011010000100101111001100111001101100000001001100101010100110111011111101001010011111100111100010110010001111111000110101101111111010010011001001010000001100111110110011111001011101010000100001101011111010000011010001011001011001011101001111001000110110010110110100011000100010111010100001010001010101000010011101101110011000101011110001001011000001010101101000011111111000011101101011110100111010100110001101111010111101011000001111001101001
+11111110111100111010001101101010001110011010101000011010101101010001000100010111001100110101011010101100011100011110101010100111011100110101001001011100111011010101000000101111001110101110001110011111110010100010011000110101001000010010101000001001110010111101111011001000010001101010010000101111011011000100001010101010011101000111110000000101100100111001111001001101001000111011101110011010000100110001010000000111110010100110000110111100010110000111001000010111011000111101001101000111111011010001
+01101101011101011011000001110100110100000011110001010111000011111100010100101010001100001011001110101110110000001001111000001001110010111100100101001111101001101110010100110011000000101110000000101100000011001000011010000100101101101111011111001101110000100010100111011000000101100000101001010100101100110001100110011111011110001101001111010111000000010010101000011011001011101100111101011100110110000110011111001100110111110101011100000111101010111110001101111110110110011010111101000100001111100010
+00001111000011101011111001110001111111111111101101110101011111111110101000010111101101001000100110001100001101111010100100111010011100011101011000100000000010110000111000010110011000000011111001000100110011100010000001110001001011000010110000000101100011011110110010010110101111100001100011100000101011011010100010110001001110101011101111011000001000101011110011011101100011011101100001010000011101011001001000000001000010010100001110100101110100101110111111100001110001000000011110100001100101111010
+11010001001010100100011101100110011011010111010101001110001100010110001011001101011101001000000110101101111001011110101110101110111001101100100010110111010010000000110101101110110010010000100100010011100010110011011111000100010000001100100111100110001101011001111101110111011001010000010100111110111111001110010010111010011101101110000100011001001111011110110111001000101100100111001001001011110010001011110100101001101001101110001101111100101101110000110011101111010011100100110111001001100010001010
+01000101011110001001010011011101010010001011101001011110000100010000001000011001101100010000011000010011010100111101100011111110001110001111001000001010001111000100101111111001000110100101011100100000110011001101111110111100000011110010001101010001110101010000110011010000001000000010010010001110001010011000110001001000010001000111110001100000110111011011101101110011110010000110001011000011110001111111110010101101011011001000100110001001100110010001110101101100001100111000011101101100001101011110
+10110101110111001111011111110011011010111001111101000010000010100001000010000010100101000101000011001011000111100011101101101010101101100100010111010010011100010000100001110101010001010111100100001110000011010010000010000111010001000010010101110101100000111001110111000100110000001100010001110010011111000000011000010110001000011100010101100110101111001001101110110000111011101011000010101101110101101110100000011010011000000111111001011110101101100010000111100101011001111111010100000111000000101100
+11010000110111111011011100010100001011111111110100000101011100011111001110101000010111001100101101001010100000001010011000100101010010110100100011100110110010110011000111000111111011000110100001001101101111001111011100011001010000010110001000010111000001000111110010010110111101000111010111011001101011010110110111010110100100000010101000010010110101101110011101100110011100010000001110010001100010111011010110100011011011110001000111111111111000001011010110111100000100111101011010000011010010100010
+10000101111000010111000011010110000100001111110001011000111100101111101000111101111001010001011100110010111111010000110000111000011000000000101000011001011110001001010010011001111010000011001001000000010111011010010010000101100011010000001000010101100000000010111101011010100101001001110110100011010110100001110001000110100001010010110100011100101101001000011111001110011100111000011010001001111011101100101000010011100001100001001010000101110011011001001011011000011010011010010010001010001110010010
+01010000110011110111110000101011001100000101100011011111000100100111101010001101010000001001010101101001010010000101111111101010001001001111111111111101000111011011000101111010110010101001111100011001111000001011011111010011101111011001110000111000000001100101101000011011001010001001100001101010011100000011110110111010001011011010000000001100011111111000001101010011011000001111001101000110010000110111100100100001110111001101010011010010011100010101001100000111001110011100110100110100010011111100
+11100110010100100101001000111111110100110011001100111011111101101000010110111000111111100000000011101111000101011100000001110011001100011011000100011011011011100100011010101110001000011010010000100111100110111110100101110100100001010110010110110011111110101001000110111110010010100101000101100010100101111010110000011000011101100000010000110001010111001100010110101000101001001100110101001001101001110010101011110100101100011001111101001001111110000000000101001100000110010100001001011111010111010111
+11011010111010000110111110100101010010101111001010001110011101001000101110010110000110110001110100010101110000010101111110111101011110110000110001001100000000110011010011000010111000011100000110101000110001000101101111110100001000101010011000110000011010000000110111010101100111100100000010000011001010011101110100010001000111000111111100100110100010011001001001000001111111100011110110011001101010111001011110110001110010110101101011010010011011000110011101101011100000001010101110100010110110110010
+01101101010111100110000101110001110110001101111010100001110100111010001100000000111001100010011100100101100110011100101101000100010000010010000111001001010111111010111111001100101101111011011110000011010011011001110100010100101100111010000110011100011010001011100011010011001011000010101000010010100000110000111011001111101001101111111001101110010111111001100100111100001010101011110010010010010010111101110101010100111000010001101111110001100000010001111110101001011011110011100011111100111101110000
+01111001111101111110110111011011000010010010010011100111101101000100101011111111000111011111000111001010001100101111100001000010000111111010111100001000011000111110000100010110110100010100001100110000001100101101100100001100111000111100000101000000100101100001001111110101110111111101101000100101010010110111000101000101100101101101110111110100110010111001100011101100010101101001000001011110101011100101110000110000111101110010011110100100101110010010000001001011100111111111010011000100100000100111
+00010111101010011010010101100111110110110101110001100101001011011011001010111111110111011111101001111000100100110111101101111001100000000101101101010101010001101010101101100100001000010011101001011111011011001101111101111110010011101111000000100110001001100111010011101001100101101110011010001010110100110011000111011101001001011001001001100111100010001001011100001101001111000001100101010011011010111001110110010000110011010111111001111000110111010110111111011001010101111101001101101111110011111000
+10000000110011101001011111011010100001010110100111110111001010011111010101101110110111011000110100001001100101110101101011010101011000110110111101011011011111111011010001101100100111111110011011000101010101001100010101000101101001101101000100001111111100111011100100100111000010010101111011010110001010101101110100101001000010111000000001001001000101100000011101001010100100111110000001011001001000110011010010010001011110000001001000110111001111001110110111001101000011000001110100110100011111100111
+01100110100100110110011100110111110110111100100101101010101000011111101011111111100011011101001010001001010001111100111110101000010000000010111000001101101111011100110101101101010001001111001100100101001000110101100001011100000110100111111010101000111110100110001011100100100011100011001001010000111110010001001011010010011001000100011101100000111010110001001011000111100000111000011010111001110001100010110111100100101101001010000011100011011100001010010001000100001010100000000100001000100100101001
+11101110111111001110100101001000110000000000011000111111110110100100000010101010001000010010010000000100000010111010011000001110010010000101001100001011010111101010011101011100101010010010101100010111110000000001110111100001010001110101011001110010011111110011011010010110011001101011001001000100110011101001000100011000111110100101001110000101001110100000100110110101110111101000010100010101100001110001110000010101000001111010110010111000111011110000010000110110100110101000100011100010000101111010
+11010010001100100100001000000111000011000011011100000110110110111101000101111111010111011000110111110101001110101000100100100110000000000100100101111110011111001110000100000001101011101000110111100010011101101011100111111101010110011001001111111100001011110001011010001010011011101001010000000111011100100010110010010000111101010100111111101010011000110010100000110100001111001000111101100000001000010101110110011111100010110110111100110100111111000110100001011000010110110011011001011011101010100111
+00110100101100010000011000101000111010101110111000010000110111011100111100100010000011011000110011000011001010000010000001000011000010101111001010001101110100110011111110100101011100101010110011011000001011001101111001101011010011111111000000111001011111111101000100000011000100011011011110000111101000001110011110010110111011010010011011110010000111101100011101100111111000011000010010011010000111110010110001110000110011110101111011010100111010001110010111010110010100011110000100000001111110011010
+00110111110101000000101001110011111101000111110111011100111011100101011100001101001111010011101001101011100011011001000000011101100010011111111010101101101011101001010011010101101010011101001000100001001111111101000100100010101110101101000110011010001010101011011101111000100110010101100010000011000111100011011100111100011001010001100110101100011000001001010001101010110101001101000010001100100110110111010110011011010100011111001001000110001101000010100101011000010100010111011000001110110101100010
+00011010100100110001100000010110100110100110001100010001111000000010100010001000001000001000100100110000110110111110000111111100110000110111001100100010111101111111101111011010011100101111100000001110010011100101110011110001000011000001011010001111101110100001111010100010100000010010111011001000000111100111001100001110110010001010010000101011100100101011100001110010100100010000010111101011100110010100111110000011011111000101010100101100011101001000100100010100111000101010010001100000011110000111
+00001110010101011111111011010010101010000001110111001000100010100111011100010000111100001110011010101111001011110100100110010001100010001000001100110110001010111010001101011010110100001111101101111011111110010100010001111000101000111101101111100001110111010001111010010101011111111110101000100101010001000000001111000001011011110100001000000110100100000001101010010101000100111010000000101111101000111111011110110100010010111000001111110110101011111001101010110010100001011001000110111100100000011110
+00011110110100101111011100110000110111110111011101001111111001111110011101011101111000000101101111000101111100000111010011000101110001011100100010101101100100100101000111100110100010110111011101001000011000011011101011100111100000000101010111010101010010100011101010100111101111100111001010100101000011100100011111010011001101000110111011100010101100110110100101010010011100100101011011001110000110101000111010011111010100001010000000001000111111101100001101110110001101101000100000100101001111011010
+00010100011010110101101000000010111010001110111010101100101111010010010101101001001100110111000001111100000000010001110011011011100011100001110111110010000110111001010101111111000001011111001010111010000110101101001111111011100010000100100110111110010101000111011000001110001100010110110001110000100101100100111001000011011100111101011010101110100101111101111111100010111011111011111011100011101010001100100000011110101001011100101000101100101110011011100100101000110001011101101010110001001111101010
+00001000110111100111000011101001011100111100111110101011101011010011001111111110110000000110111101010001011010100100100000110100100101100001111001000110101111011000001101000010001111111000010101101000010101001110011111001100010110001101011001101011000110001000000011101111011111110000100001010011111100001101101111100000110100000001010001110110010000101001111000101110010000000110001101101010000110010111111111101001000111011001011111001111100001000100010101011010110110011110011001100110010010011000
+1110110100110011111111111101101001101110000001010011111011001111011100110011100111101100101101111000100001110111011011011111111111100000101100111010111111100001101110110001010011000000100101001000111011101000010011111110110001011011010101101001011010010001011001010110011100100011000010111111111001010101101110010110000100110110100101110001011100100010001000001001111101101001110001110111011011101000111101101111011011110001011110100001110011111111110111101010100001010101010101100100001110    </div>
+</div>
+
+
 <script>
-/* ======= ADVANCED ENIGMA MACHINE ======= */
+/* ===== LẤY SEQUENCE ===== */
+const sequenceDisplay = document.getElementById("sequenceDisplay");
+const binaryPrevEl    = document.getElementById("binaryPrev");
+const binaryNowEl     = document.getElementById("binaryNow");
+const inputCell       = document.getElementById("inputCell");
+const cells           = document.querySelectorAll(".shift-cell:not(.input-cell)");
 
+const binarySequence = sequenceDisplay.textContent.trim().replace(/\s+/g, "").split("");
 
-// Betting system variables
-let currentCapital = 0;
-let initialCapital = 0;
-let bettingActive = false;
-let bettingHistory = [];
-let currentBetRound = 0;
-let baseBetAmount = 1000;
-let roundProfit = 0; // Lãi của round hiện tại
-let profitThresholdReached = false; // Đã đạt ngưỡng lãi 20%
-let fromLuckyInputs = false; // Đánh dấu nguồn gọi processBetting
+let seqIndex = 0;
 
-// DOM elements
-const inputs = document.querySelectorAll(".in");
-const autoOuts = document.querySelectorAll(".auto-out");
-const luckyInputs = document.querySelectorAll(".lucky-input");
-const outputs = document.querySelectorAll(".out");
-const info = document.getElementById("info");
-const history = document.getElementById("history");
+/* ===== TRẠNG THÁI LƯU ===== */
+let savedState = null;
+// { index, seqBit, binary }
 
-// Betting DOM elements
-const initialCapitalInput = document.getElementById("initialCapital");
-const currentCapitalDisplay = document.getElementById("currentCapital");
-const profitDisplay = document.getElementById("profitDisplay");
-const startBettingBtn = document.getElementById("startBetting");
-const setCapitalBtn = document.getElementById("setCapital");
-const gameStatusDisplay = document.getElementById("gameStatus");
-const bettingHistoryPanel = document.getElementById("bettingHistory");
-const multiplierInputs = document.querySelectorAll(".multiplier-input");
+/* ===== FLAG TÔ MÀU ===== */
+let mismatch = new Array(binarySequence.length).fill(false);
 
+/* ===== RENDER SEQUENCE ===== */
+function renderSequence() {
+    let html = "";
+    binarySequence.forEach((bit, i) => {
+        let cls = "sequence-bit";
+        if (i === seqIndex) cls += " current";
+        if (mismatch[i]) cls += " mismatch";
+        html += `<span class="${cls}">${bit}</span>`;
+    });
+    sequenceDisplay.innerHTML = html;
+}
+renderSequence();
 
+/* ===== TÍNH BINARY (phiên bản mới) ===== */
+function calcBinary() {
+    const [a, b, c] = [...cells].map(cell => cell.textContent);
 
+    // Nếu dữ liệu chưa đầy đủ
+    if ([a, b, c].includes("-")) return "-";
 
+    // Nếu a bằng b thì lấy c
+    if (a === b) return c;
 
-// Bit conversion helpers
-function bitsToNum(bits) {
-  return bits.reduce((a, b) => (a << 1) | b, 0);
+    // Nếu a khác b thì trả về 0
+    return "0";
 }
 
-function numToBits(n) {
-  return Array.from({ length: 5 }, (_, i) => (n >> (4 - i)) & 1);
-}
-
-// Function to flip exactly 2 random bits
-function flipTwoBits(bits) {
-  const bitsArray = bits.split('');
-  const flippedIndices = [];
-  
-  // Choose 2 different random positions
-  for (let i = 0; i < 2; i++) {
-    let index;
-    do {
-      index = Math.floor(Math.random() * 5);
-    } while (flippedIndices.includes(index));
-    flippedIndices.push(index);
-    bitsArray[index] = bitsArray[index] === '0' ? '1' : '0';
-  }
-  
-  return {
-    result: bitsArray.join(''),
-    flippedPositions: flippedIndices.map(i => i + 1),
-    originalBits: bits
-  };
-}
-
-// Enigma machine variables and functions
-let step = 0;
-let totalOps = 0;
-let currentMode = 'ecb';
-let operationHistory = [];
-let previousCipher = 0;
-
-// Initialize enigma state
-function initState() {
-  // Initialize rotors, keys, etc.
-  step = 0;
-  totalOps = 0;
-  operationHistory = [];
-}
-
-// Update key schedule
-function updateKeySchedule() {
-  // Update rotor positions and key schedule
-  // Simplified implementation
-}
-
-// Process with selected mode
-function processWithMode(x) {
-  const rounds = parseInt(document.getElementById('rounds').value) || 3;
-  return processRounds(x, rounds);
-}
-
-// Process encryption rounds
-function processRounds(x, rounds = 3) {
-  let result = x;
-  for (let i = 0; i < rounds; i++) {
-    result = (result * 7 + i) & 31; // Simplified round function
-  }
-  return result;
-}
-
-// Update statistics
-function updateStats() {
-  document.getElementById('totalOps').textContent = totalOps;
-  document.getElementById('cycles').textContent = step;
-  document.getElementById('diffusion').textContent = '85%'; // Simplified
-}
-
-// Initialize rotor display
-function initRotorDisplay() {
-  const rotorGrid = document.getElementById('rotorGrid');
-  if (rotorGrid) {
-    rotorGrid.innerHTML = '';
-    for (let i = 1; i <= 10; i++) {
-      const rotorItem = document.createElement('div');
-      rotorItem.className = 'rotor-item';
-      rotorItem.innerHTML = `
-        <div class="rotor-name">Rotor ${i}</div>
-        <div class="rotor-value">${Math.floor(Math.random() * 32).toString(16).toUpperCase().padStart(2, '0')}</div>
-      `;
-      rotorGrid.appendChild(rotorItem);
+/* ===== INPUT ===== */
+inputCell.addEventListener("input", () => {
+    const v = inputCell.value;
+    if (!/^[01]$/.test(v)) {
+        inputCell.value = "";
+        return;
     }
-  }
-}
 
+    /* ===== SHIFT ===== */
+    for (let i = 0; i < cells.length - 1; i++) {
+        cells[i].textContent = cells[i + 1].textContent;
+    }
+    cells[cells.length - 1].textContent = v;
+    inputCell.value = "";
 
+    /* ===== TÍNH KẾT QUẢ ===== */
+    const result = calcBinary();
 
- 
- 
-// Add to history
-function addToHistory(message) {
-  const timestamp = new Date().toLocaleTimeString();
-  const historyItem = `[${timestamp}] ${message}`;
-  operationHistory.unshift(historyItem);
-  
-  if (operationHistory.length > 10) {
-    operationHistory.pop();
-  }
-  
-  history.innerHTML = operationHistory.map(item => 
-    `<div class="history-item">${item}</div>`
-  ).join('');
-}
-
-// Betting system functions
-function formatCurrency(amount) {
-  return amount.toLocaleString('vi-VN');
-}
-
-function formatCurrencyWithSeparator(amount) {
-  // Format đúng chuẩn Việt Nam: mỗi 3 số có 1 dấu chấm
-  return amount.toLocaleString('vi-VN');
-}
-
-function updateCapitalDisplay() {
-  currentCapitalDisplay.textContent = formatCurrencyWithSeparator(currentCapital);
-  
-  // Hiển thị lãi của round hiện tại
-  profitDisplay.textContent = (roundProfit >= 0 ? '+' : '') + formatCurrencyWithSeparator(roundProfit);
-  
-  // Update profit display styling
-  profitDisplay.classList.remove('positive', 'negative');
-  if (roundProfit > 0) {
-    profitDisplay.classList.add('positive');
-  } else if (roundProfit < 0) {
-    profitDisplay.classList.add('negative');
-  }
-  
-  // Kiểm tra ngưỡng lãi 20%
-  const totalProfit = currentCapital - initialCapital;
-  const profitPercentage = (totalProfit / initialCapital) * 100;
-  
-  if (profitPercentage >= 20 && !profitThresholdReached && bettingActive) {
-    profitThresholdReached = true;
-    bettingActive = false;
-    
-    // Hiển thị thông báo
-    gameStatusDisplay.textContent = '🎉 Perfect!!!🎉 Perfect!!!🎉 Perfect!!! Hãy dừng lại đúng lúc - Tham lam là mất hết đấy @-@';
-    gameStatusDisplay.classList.remove('play-prompt', 'warning');
-    gameStatusDisplay.classList.add('success-pulse', 'wide-notification');
-    gameStatusDisplay.style.border = '3px solid #10b981';
-    gameStatusDisplay.style.color = '#ffffff';
-    gameStatusDisplay.style.fontSize = '1.4em';
-    
-    // Thông báo trình duyệt
-    if (Notification.permission === "granted") {
-      new Notification("🎉 Mục Tiêu Đạt Được!", {
-        body: `Lãi ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%) - Hôm nay như thế là đủ rồi!`,
-        icon: "🎯",
-        requireInteraction: true
-      });
-    } else if (Notification.permission !== "denied") {
-      Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-          new Notification("🎉 Mục Tiêu Đạt Được!", {
-            body: `Lãi ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%) - Hôm nay như thế là đủ rồi!`,
-            icon: "🎯",
-            requireInteraction: true
-          });
+    /* ===== BƯỚC 1: KIỂM TRA TRẠNG THÁI CŨ ===== */
+    if (savedState) {
+        const { index, seqBit, binary } = savedState;
+        if (binary !== "-" && seqBit !== binary) {
+            mismatch[index] = true;
         }
-      });
     }
-    
-    addToBettingHistory(`🎉 Đạt ngưỡng lãi 20%! THU VỀ: ${formatCurrencyWithSeparator(totalProfit)} - PERFECT`, true);
-    addToHistory(`Profit threshold reached: ${formatCurrencyWithSeparator(totalProfit)} (${profitPercentage.toFixed(1)}%)`);
-  }
-  
-  if (currentCapital <= 0) {
-    gameStatusDisplay.textContent = '💔 Hết tên lửa - BẠN ĐÃ XANH CỎ XIN CHÚC MỪNG!';
-    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.2))';
-    bettingActive = false;
-  }
-}
 
-function addToBettingHistory(message, isWin = null) {
-  const timestamp = new Date().toLocaleTimeString();
-  const historyItem = document.createElement('div');
-  historyItem.className = 'bet-history-item';
-  if (isWin === true) historyItem.classList.add('win');
-  if (isWin === false) historyItem.classList.add('lose');
-  historyItem.textContent = `[${timestamp}] ${message}`;
-  
-  bettingHistoryPanel.insertBefore(historyItem, bettingHistoryPanel.firstChild);
-  
-  if (bettingHistoryPanel.children.length > 10) {
-    bettingHistoryPanel.removeChild(bettingHistoryPanel.lastChild);
-  }
-}
+    /* ===== BƯỚC 2: HIỂN THỊ ===== */
+    binaryPrevEl.textContent = binaryNowEl.textContent;
+    binaryNowEl.textContent  = result;
 
-function setCapital() {
-  // Parse giá trị từ input, loại bỏ dấu chấm và dấu phẩy
-  const capitalValue = parseInt(initialCapitalInput.value.replace(/[.,]/g, '')) || 10000000;
-  
-  if (capitalValue < 1000) {
-    gameStatusDisplay.textContent = '⚠️ Số lượng tên lửa tối thiểu là 1,000';
-    gameStatusDisplay.classList.add('warning');
-    setTimeout(() => {
-      gameStatusDisplay.classList.remove('warning');
-      gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" để BẮT ĐẦU chiến đấu!';
-      gameStatusDisplay.classList.add('play-prompt');
-    }, 3000);
-    return;
-  }
-  
-  // Cho phép tăng vốn cả khi đang chơi và khi chưa chơi
-  if (!bettingActive) {
-    // Chưa chơi - cập nhật vốn ban đầu và vốn hiện tại
-    initialCapital = capitalValue;
-    currentCapital = capitalValue;
-    roundProfit = 0; // Reset lãi round
-    updateCapitalDisplay();
-    
-    // Hiển thị thông báo thành công
-    gameStatusDisplay.textContent = `💰 Đã nhập Số lượng tên lửa: ${formatCurrencyWithSeparator(capitalValue)} - Vui lòng nhập Tốc độ tên lửa`;
-    gameStatusDisplay.classList.remove('warning');
-    gameStatusDisplay.classList.add('bet-prompt', 'wide-notification');
-    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
-    gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
-    gameStatusDisplay.style.color = '#f59e0b';
-    
-    // Ngừng nhấp nháy nút nhập vốn
-    setCapitalBtn.classList.remove('capital-button-pulse');
-    
-    // Enable multiplier inputs khi nhập vốn thành công
-    multiplierInputs.forEach(inp => inp.disabled = false);
-    
-    addToBettingHistory(`Nhập Số lượng tên lửa: ${formatCurrencyWithSeparator(capitalValue)}`);
-    addToHistory(`Capital set to: ${formatCurrencyWithSeparator(capitalValue)}`);
-    
-    // Focus ngay lập tức vào ô mức cược đầu tiên
-    document.getElementById('mult1').focus();
-  } else {
-    // Đang chơi - chỉ tăng vốn hiện tại, không thay đổi vốn ban đầu
-    if (capitalValue > currentCapital) {
-      const capitalIncrease = capitalValue - currentCapital;
-      currentCapital = capitalValue;
-      updateCapitalDisplay();
-      
-      // Hiển thị thông báo tăng vốn thành công
-      gameStatusDisplay.textContent = `💰 Đã tăng Số lượng tên lửa: +${formatCurrencyWithSeparator(capitalIncrease)} - Vui lòng nhập Tốc độ Tên lửa`;
-      gameStatusDisplay.classList.remove('warning');
-      gameStatusDisplay.classList.add('bet-prompt', 'wide-notification');
-      gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
-      gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
-      gameStatusDisplay.style.color = '#f59e0b';
-      
-      // Ngừng nhấp nháy nút nhập vốn
-      setCapitalBtn.classList.remove('capital-button-pulse');
-      
-      addToBettingHistory(`Tăng Số lượng tên lửa: +${formatCurrencyWithSeparator(capitalIncrease)} - Số lượng tên lửa mới: ${formatCurrencyWithSeparator(currentCapital)}`);
-      addToHistory(`Capital increased by: ${formatCurrencyWithSeparator(capitalIncrease)}`);
-      
-      // Focus ngay lập tức vào ô input mức cược đầu tiên
-      document.getElementById('mult1').focus();
-    } else if (capitalValue < currentCapital) {
-      // Không cho phép giảm vốn khi đang chơi
-      gameStatusDisplay.textContent = '⚠️ Không thể giảm Số lượng tên lửa khi đang chiến đấu! Chỉ có thể tăng Số lượng tên lửa.';
-      gameStatusDisplay.classList.add('warning');
-      setTimeout(() => {
-        gameStatusDisplay.classList.remove('warning');
-        gameStatusDisplay.textContent = '🎮 Đang chiến đấu - Nhập tọa độ để bắt đầu';
-      }, 3000);
-    } else {
-      // Vốn không đổi
-      gameStatusDisplay.textContent = '💰 Số lượng tên lửa không thay đổi - Vui lòng nhập Tọa độ Tên lửa';
-      gameStatusDisplay.classList.remove('warning');
-      gameStatusDisplay.classList.add('bet-prompt');
-      gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(251, 191, 36, 0.2))';
-      gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.5)';
-      gameStatusDisplay.style.color = '#f59e0b';
-      
-      // Focus ngay lập tức vào ô input mức cược đầu tiên
-      document.getElementById('mult1').focus();
+    /* ===== BƯỚC 3: LƯU TRẠNG THÁI MỚI ===== */
+    savedState = {
+        index: seqIndex,
+        seqBit: binarySequence[seqIndex],
+        binary: result
+    };
+
+    /* ===== BƯỚC 4: NHẢY SEQUENCE ===== */
+    if (seqIndex < binarySequence.length - 1) {
+        seqIndex++;
     }
-  }
-}
 
-function startBetting() {
-  // Parse giá trị từ input, loại bỏ dấu chấm
-  const initialCapitalValue = parseInt(initialCapitalInput.value.replace(/\./g, '')) || 10000000;
-  if (initialCapitalValue < 1000) {
-    gameStatusDisplay.textContent = '⚠️ Số lượng tên lửa tối thiểu là 1,000';
-    gameStatusDisplay.classList.add('warning');
-    setTimeout(() => {
-      gameStatusDisplay.classList.remove('warning');
-      gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" để BẮT ĐẦU chiến đấu!';
-      gameStatusDisplay.classList.add('play-prompt');
-    }, 3000);
-    return;
-  }
-  
-  initialCapital = initialCapitalValue;
-  currentCapital = initialCapitalValue;
-  bettingActive = true;
-  currentBetRound = 0;
-  profitThresholdReached = false; // Reset flag khi bắt đầu game mới
-  updateCapitalDisplay();
-  
-  // Enable input fields
-  inputs.forEach(inp => inp.classList.remove('disabled'));
-  
-  // Auto focus vào ô input đầu tiên
-  inputs[0].focus();
-  
-  // Tắt animation nút Play
-  startBettingBtn.classList.remove('play-pulse');
-  
-  // Tắt thông báo nhấp nháy và hiển thị trạng thái chơi
-  gameStatusDisplay.classList.remove('play-prompt', 'warning');
-  gameStatusDisplay.textContent = '🎮 Đang chiến đấu - Nhập tọa độ để bắt đầu';
-  gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))';
-  gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
-  gameStatusDisplay.style.color = '#e2e8f0';
-  gameStatusDisplay.style.fontSize = '1.2em';
-  
-  addToBettingHistory('Bắt đầu chiến đấu với Số lượng tên lửa: ' + formatCurrencyWithSeparator(currentCapital));
-  addToHistory('Game started with capital: ' + formatCurrencyWithSeparator(currentCapital));
-}
-
-function processBetting(inputVals, outputVals) {
-  if (!bettingActive) return;
-  
-  currentBetRound++;
-  const multipliers = Array.from(multiplierInputs).map(input => parseInt(input.value) || 1);
-  const totalBet = multipliers.reduce((sum, mult) => sum + (mult * 1000), 0);
-  
-  // Kiểm tra vốn còn đủ để cược không
-  if (currentCapital < totalBet) {
-    gameStatusDisplay.textContent = `💔 Số lượng tên lửa không đủ để chiến đấu! Cần ${formatCurrencyWithSeparator(totalBet)}, còn ${formatCurrencyWithSeparator(currentCapital)}. Vui lòng reset game để vào vạch xuất phát!`;
-    gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(251, 191, 36, 0.3))';
-    gameStatusDisplay.style.border = '2px solid #f59e0b';
-    gameStatusDisplay.style.color = '#ffffff';
-    gameStatusDisplay.classList.add('warning', 'insufficient-funds-pulse');
-    bettingActive = false;
-    addToBettingHistory(`Hết tên lửa rồi- Cần ${formatCurrencyWithSeparator(totalBet)} kg, hiện tại chỉ có ${formatCurrencyWithSeparator(currentCapital)} - Yêu cầu reset game trở về vạch xuất phát`, false);
-    return;
-  }
-  
-  let totalDeducted = 0;
-  let matchFound = false;
-  let matchPosition = -1;
-  
-  // Reset lãi round mới
-  roundProfit = 0;
-  
-  console.log('Processing betting round', currentBetRound, 'multipliers:', multipliers);
-  
-  // Lấy giá trị từ lucky inputs
-  const luckyVals = Array.from(luckyInputs).map(input => input.value);
-  
-  // Check từng bit từ 1-5
-  for (let i = 0; i < 5; i++) {
-    if (luckyVals[i] !== "") {
-      const betAmount = baseBetAmount * multipliers[i];
-      
-      console.log(`Bit ${i + 1}: lucky=${luckyVals[i]}, output=${outputVals[i]}, bet=${betAmount}`);
-      
-      if (luckyVals[i] === outputVals[i]) {
-        // Có match - cộng 80% và TIẾP TỤC CHƠI (không dừng)
-        matchFound = true;
-        matchPosition = i;
-        const winAmount = Math.floor(betAmount * 0.8);
-        currentCapital += winAmount;
-        roundProfit += winAmount; // Cộng vào lãi round
-        
-        console.log(`MATCH at position ${i + 1}! Win amount: ${winAmount}`);
-        
-        gameStatusDisplay.textContent = `🎉 Trúng mục tiêu! +${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Tiếp tục vòng ${currentBetRound + 1}`;
-        addToBettingHistory(`Trúng mục tiêu ${formatCurrencyWithSeparator(winAmount)} tại vị trí ${i + 1} - Số lượng tên lửa: ${formatCurrencyWithSeparator(currentCapital)} - Tiếp tục chiến đấu`, true);
-        
-        // Highlight match
-        luckyInputs[i].classList.add('match');
-        
-        // KHÔNG dừng betting - tiếp tục chơi
-        break;
-      } else {
-        // Không match - trừ tiền
-        currentCapital -= betAmount;
-        totalDeducted += betAmount;
-        roundProfit -= betAmount; // Trừ vào lãi round
-        
-        console.log(`NO MATCH at position ${i + 1}. Deducting: ${betAmount}`);
-        
-        gameStatusDisplay.textContent = `❌ Bit ${i + 1} không trùng - Trừ ${formatCurrencyWithSeparator(betAmount)} - Vòng ${currentBetRound}`;
-        addToBettingHistory(`Bit ${i + 1} không trùng - Trừ ${formatCurrencyWithSeparator(betAmount)} - Số lượng tên lửa: ${formatCurrencyWithSeparator(currentCapital)}`, false);
-        
-        // Kiểm tra hết vốn
-        if (currentCapital <= 0) {
-          bettingActive = false;
-          gameStatusDisplay.textContent = '💔 Hết TÊN LỬA rồi - Bạn vẫn còn thở chứ !';
-          break;
-        }
-      }
-    }
-  }
-  
-  updateCapitalDisplay();
-  
-  // Xử lý logic focus và reset theo nguồn gọi
-  if (bettingActive && fromLuckyInputs) {
-    // reset toàn bộ input
-    inputs.forEach(input => input.value = "");
-
-    // GIỮ LẠI 5 ô tọa độ, không reset ở đây
-    // luckyInputs.forEach(i => {
-    //   i.value = "";
-    //   i.classList.remove('match');
-    // });
-
-    // focus CHỈ 1 NƠI
-    inputs[0].focus();
-
-    fromLuckyInputs = false;
-  } else {
-    // KHÔNG reset tọa độ ở đây - chỉ reset khi gọi từ compute (sau khi nhập ô 5 input)
-    // if (bettingActive && currentCapital > 0) {
-    //   setTimeout(() => {
-    //     luckyInputs.forEach(i => {
-    //       i.value = "";
-    //       i.classList.remove('match');
-    //     });
-    //     luckyInputs[0].focus();
-    //     gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập TỌA ĐỘ may mắn tiếp theo`;
-    //   }, 1500);
-    // }
-  }
-  
-  console.log('Final capital:', currentCapital, 'Betting active:', bettingActive, 'Round profit:', roundProfit);
-}
-
-// Auto-processing function
-function autoCompute() {
-  const vals = [...inputs].map(i => i.value);
-  if (vals.some(v => v === "")) return;
-
-  let x = bitsToNum(vals.map(Number));
-  step++;
-  totalOps++;
-  
-  // Update key schedule
-  updateKeySchedule();
-  
-  // Process with selected mode
-  let result = processWithMode(x);
-  
-  const out = numToBits(result & 31);
-  out.forEach((b, i) => outputs[i].value = b);
-  
-  // Update displays
-  updateStats();
-  
-  const hexOutput = result.toString(16).toUpperCase();
-  info.textContent = `🔢 Step ${step} | Auto-Processed: ${hexOutput} | Mode: ${currentMode.toUpperCase()} | Rounds: ${document.getElementById('rounds').value}`;
-  
-  addToHistory(`Auto ${vals.join('')} → ${out.join('')} (0x${hexOutput})`);
-}
-
-// Compare auto inputs with outputs and highlight matches
-function compareAndHighlight() {
-  const autoVals = [...autoOuts].map(i => i.value);
-  const outputVals = [...outputs].map(i => i.value);
-  
-  // Remove all match classes first
-  autoOuts.forEach(input => input.classList.remove('match'));
-  
-  // Check for matches and highlight
-  autoVals.forEach((autoVal, index) => {
-    if (autoVal !== "" && autoVal === outputVals[index]) {
-      autoOuts[index].classList.add('match');
-    }
-  });
-}
-
-// Main encryption/decryption function
-function compute(encryptMode = true) {
-  const vals = [...inputs].map(i => i.value);
-  if (vals.some(v => v === "")) return;
-
-  let x = bitsToNum(vals.map(Number));
-  step++;
-  totalOps++;
-  
-  // Update key schedule
-  updateKeySchedule();
-  
-  // Process with selected mode
-  let result = processWithMode(x);
-  
-  if (!encryptMode) {
-    // For decryption, we'd need to reverse the process
-    // This is simplified - real decryption would require storing states
-    result = processRounds(x ^ 0x55555); // Simple reverse example
-  }
-  
-  const out = numToBits(result & 31);
-  
-  // Apply 2-bit flipping transformation for encryption
-  let flipResult = null;
-  if (encryptMode) {
-    const inputBits = vals.join('');
-    flipResult = flipTwoBits(inputBits);
-    const finalBits = flipResult.result.split('');
-    
-    // Use the flipped bits as output
-    finalBits.forEach((b, i) => outputs[i].value = b);
-    
-    // Update displays with flip information
-    updateStats();
-    
-    const modeText = 'Encrypted + 2-Bit Flip';
-    const hexOutput = result.toString(16).toUpperCase();
-    info.textContent = `🔢 Step ${step} | ${modeText}: ${finalBits.join('')} | Flipped: ${flipResult.flippedPositions.join(',')} | Original: ${inputBits}`;
-    
-    addToHistory(`${modeText} ${inputBits} → ${finalBits.join('')} (flipped positions: ${flipResult.flippedPositions.join(',')})`);
-  } else {
-    // Regular decryption output
-    out.forEach((b, i) => outputs[i].value = b);
-    
-    // Update displays
-    updateStats();
-    
-    const modeText = 'Decrypted';
-    const hexOutput = result.toString(16).toUpperCase();
-    info.textContent = `🔢 Step ${step} | ${modeText}: ${hexOutput} | Mode: ${currentMode.toUpperCase()} | Rounds: ${document.getElementById('rounds').value}`;
-    
-    addToHistory(`${modeText} ${vals.join('')} → ${out.join('')} (0x${hexOutput})`);
-  }
-  
-  // Compare and highlight matches after encryption
-  if (autoOuts[0].value !== "") {
-    compareAndHighlight();
-  }
-  
-  // Process betting if active
-  if (bettingActive && encryptMode && flipResult) {
-    const finalBits = flipResult.result.split('');
-    processBetting(vals, finalBits);
-    
-    // CHỈ reset tọa độ sau khi nhập ô 5 input
-    setTimeout(() => {
-      luckyInputs.forEach(i => {
-        i.value = "";
-        i.classList.remove('match');
-      });
-      luckyInputs[0].focus();
-      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập TỌA ĐỘ may mắn tiếp theo`;
-    }, 1500);
-  } else if (bettingActive && !encryptMode) {
-    // For decryption, use regular output
-    const finalBits = out;
-    processBetting(vals, finalBits);
-    
-    // CHỈ reset tọa độ sau khi nhập ô 5 input
-    setTimeout(() => {
-      luckyInputs.forEach(i => {
-        i.value = "";
-        i.classList.remove('match');
-      });
-      luckyInputs[0].focus();
-      gameStatusDisplay.textContent = `🎮 Vòng ${currentBetRound + 1} - Nhập TỌA ĐỘ may mắn tiếp theo`;
-    }, 1500);
-  }
-}
-
-// Reset function
-function softReset() {
-  inputs.forEach(i => i.value = "");
-  autoOuts.forEach(i => {
-    i.value = "";
-    i.classList.remove('match');
-  });
-  outputs.forEach(o => o.value = "");
-  previousCipher = 0;
-  info.textContent = "Advanced Enigma Ready - 10 Rotors Active";
-  
-  // Reset betting system - bắt đầu lại từ đầu
-  bettingActive = false;
-  currentBetRound = 0;
-  roundProfit = 0;
-  initialCapital = 0;
-  currentCapital = 0;
-  updateCapitalDisplay();
-  
-  // Xóa giá trị trong ô nhập vốn
-  initialCapitalInput.value = "";
-  
-  // Disable input fields
-  inputs.forEach(inp => inp.classList.add('disabled'));
-  
- 
-  
-  // Tắt animation nút Play
-  startBettingBtn.classList.remove('play-pulse');
-  
-  // Hiển thị thông báo yêu cầu nhập vốn
-  gameStatusDisplay.classList.remove('warning', 'play-prompt', 'bet-prompt');
-  gameStatusDisplay.textContent = '💰 Vui lòng nhập Số lượng tên lửa để bắt đầu';
-  gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
-  gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
-  gameStatusDisplay.style.color = '#e2e8f0';
-  gameStatusDisplay.style.fontSize = '1.2em';
-  
-  // Focus vào ô input vốn ban đầu và thêm lại hiệu ứng nhấp nháy
-  initialCapitalInput.focus();
-  initialCapitalInput.classList.add('cursor-blink-active');
-  
-  // Clear betting history
-  bettingHistoryPanel.innerHTML = '<div class="bet-history-item">Hệ thống tên lửa đã sẵn sàng</div>';
-  
-  addToHistory('System reset - Betting game reset - Ready for new operation');
-}
-
-  
-
-// Event listener for initial capital input
-initialCapitalInput.addEventListener('input', () => {
-  // Format số tiền khi nhập
-  const value = parseInt(initialCapitalInput.value.replace(/\./g, '')) || 0;
-  if (value >= 1000) {
-    initialCapitalInput.value = formatCurrencyWithSeparator(value);
-  }
+    renderSequence();
+    inputCell.focus();
 });
 
-initialCapitalInput.addEventListener('focus', () => {
-  // Xóa format để user nhập số mới
-  const value = parseInt(initialCapitalInput.value.replace(/\./g, '')) || 0;
-  initialCapitalInput.value = value;
-  // Xóa hiệu ứng nhấp nháy khi user focus vào ô
-  initialCapitalInput.classList.remove('cursor-blink-active');
+/* ===== RESET ===== */
+document.getElementById("resetBtn").onclick = () => {
+    cells.forEach(c => c.textContent = "-");
+    inputCell.value = "";
+    binaryPrevEl.textContent = "-";
+    binaryNowEl.textContent  = "-";
+
+    seqIndex = 0;
+    savedState = null;
+    mismatch.fill(false);
+
+    renderSequence();
+    inputCell.focus();
+};
+window.addEventListener("load", () => {
+    inputCell.focus();
 });
 
-initialCapitalInput.addEventListener('blur', () => {
-  // Format lại khi mất focus
-  const value = parseInt(initialCapitalInput.value) || 0;
-  if (value >= 1000) {
-    initialCapitalInput.value = formatCurrencyWithSeparator(value);
-  }
-});
-
-// Xóa hiệu ứng nhấp nháy khi user bắt đầu nhập
-initialCapitalInput.addEventListener('input', () => {
-  initialCapitalInput.classList.remove('cursor-blink-active');
-});
-
-// Event listeners for main inputs
-inputs.forEach((inp, idx) => {
-  inp.addEventListener("input", () => {
-    // Chỉ cho phép nhập khi betting đã được kích hoạt
-    if (!bettingActive) {
-      inp.value = "";
-      
-      // Hiển thị thông báo nổi bật
-      gameStatusDisplay.textContent = '⚠️ VUI LÒNG BẤM "PLAY" TRƯỚC KHI NHẬP TỌA ĐỘ !';
-      gameStatusDisplay.classList.add('warning');
-      
-      // Thông báo trình duyệt
-      if (Notification.permission === "granted") {
-        new Notification("Enigma Betting", {
-          body: "Vui lòng bấm 'Play' trước khi nhập Tọa độ !",
-          icon: "⚠️",
-          requireInteraction: true
-        });
-      } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(permission => {
-          if (permission === "granted") {
-            new Notification("Enigma Betting", {
-              body: "Vui lòng bấm 'Play' trước khi nhập Tọa độ !",
-              icon: "⚠️",
-              requireInteraction: true
-            });
-          }
-        });
-      }
-      
-      // Tự động tắt sau 3 giây
-      setTimeout(() => {
-        gameStatusDisplay.classList.remove('warning');
-        gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" ĐỂ BẮT ĐẦU CHIẾN ĐẤU!';
-        gameStatusDisplay.classList.add('play-prompt');
-      }, 3000);
-      return;
-    }
-    
-    if (inp.value !== "0" && inp.value !== "1") {
-      inp.value = "";
-      return;
-    }
-    
-    // KHÔNG reset lucky inputs khi nhập ô 1 - chỉ reset sau khi nhập ô 5 input
-    // if (idx === 0) {
-    //   luckyInputs.forEach(luckyInput => {
-    //     luckyInput.value = "";
-    //     luckyInput.classList.remove('match');
-    //   });
-    // }
-    
-    // Auto-focus sang ô tiếp theo khi nhập xong
-    if (idx < inputs.length - 1)
-      inputs[idx + 1].focus();
-    
-    // Auto-trigger encryption when all 5 bits are entered
-    if (idx === inputs.length - 1 && inp.value !== "") {
-      setTimeout(() => compute(true), 100);
-    }
-  });
-
-  inp.addEventListener("keydown", e => {
-    if (e.key === "Backspace" && inp.value === "" && idx > 0)
-      inputs[idx - 1].focus();
-  });
-});
-
-
-
-// Betting system event listeners
-startBettingBtn.onclick = startBetting;
-setCapitalBtn.onclick = setCapital;
-
-// Multiplier input validation và auto-focus
-multiplierInputs.forEach((input, index) => {
-  input.addEventListener('input', () => {
-    // Cho phép giá trị bất kỳ, chỉ đảm bảo không rỗng
-    let value = parseInt(input.value) || 0;
-    if (value < 0) value = 0; // Chỉ đảm bảo không âm
-    input.value = value;
-    
-    // Nếu ô đã có giá trị, tự động focus sang ô tiếp theo sau 2 giây
-    if (input.value !== '' && input.value !== '0' && index < multiplierInputs.length - 1) {
-      setTimeout(() => {
-        multiplierInputs[index + 1].focus();
-      }, 2000);
-    }
-    
-    // Kiểm tra nếu nhập xong ô số 5 và tất cả ô đều có giá trị
-    if (index === multiplierInputs.length - 1 && input.value !== '' && input.value !== '0') {
-      // Kiểm tra tất cả các ô đều đã có giá trị
-      const allFilled = [...multiplierInputs].every(inp => inp.value !== '' && inp.value !== '0');
-      
-      if (allFilled) {
-        // Kích hoạt nút Play nhấp nháy
-        startBettingBtn.classList.add('play-pulse');
-        
-        // Hiển thị thông báo bấm Play để bắt đầu chơi
-        gameStatusDisplay.textContent = '🎮 BẤM NÚT "PLAY" để phóng Tên Lửa !';
-        gameStatusDisplay.classList.remove('warning', 'bet-prompt');
-        gameStatusDisplay.classList.add('play-prompt');
-        gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.3))';
-        gameStatusDisplay.style.border = '3px solid #3b82f6';
-        gameStatusDisplay.style.color = '#ffffff';
-        gameStatusDisplay.style.fontSize = '1.3em';
-        
-        // Focus vào nút Play
-        setTimeout(() => {
-          startBettingBtn.focus();
-        }, 1000);
-      }
-    }
-  });
-});
-
-// Event listeners for lucky inputs (TỌA ĐỘ may mắn)
-luckyInputs.forEach((inp, idx) => {
-  inp.addEventListener("input", () => {
-    // Chỉ cho phép nhập 0 hoặc 1
-    if (inp.value !== "0" && inp.value !== "1") {
-      inp.value = "";
-      return;
-    }
-    
-    // Auto-focus to next field
-    if (idx < luckyInputs.length - 1) {
-      luckyInputs[idx + 1].focus();
-    }
-    
-    // Auto-trigger betting comparison when all 5 bits are entered
-    if (idx === luckyInputs.length - 1 && inp.value !== "") {
-      setTimeout(() => {
-        const luckyVals = Array.from(luckyInputs).map(i => i.value);
-        const outputVals = Array.from(outputs).map(o => o.value);
-
-        if (outputVals.every(val => val !== "")) {
-          fromLuckyInputs = true;      // 👈 ĐÁNH DẤU NGUỒN
-          processBetting(luckyVals, outputVals);
-        }
-      }, 100);
-    }
-  });
-
-  inp.addEventListener("keydown", e => {
-    if (e.key === "Backspace" && inp.value === "" && idx > 0) {
-      luckyInputs[idx - 1].focus();
-    }
-  });
-});
-
-// Mode change handler
-document.getElementById('mode').addEventListener('change', () => {
-  currentMode = document.getElementById('mode').value;
-  addToHistory(`Mode changed to ${currentMode.toUpperCase()}`);
-});
-
-// Key/IV change handlers
-document.getElementById('customKey').addEventListener('change', () => {
-  initState();
-});
-
-document.getElementById('customIV').addEventListener('change', () => {
-  initState();
-});
-
-// Reset Game button handler
-document.getElementById('reset').addEventListener('click', () => {
-  // Reset tất cả biến game
-  currentCapital = 0;
-  initialCapital = 0;
-  bettingActive = false;
-  bettingHistory = [];
-  currentBetRound = 0;
-  roundProfit = 0;
-  profitThresholdReached = false;
-  
-  // Reset displays
-  currentCapitalDisplay.textContent = '0';
-  profitDisplay.textContent = '0';
-  profitDisplay.classList.remove('positive', 'negative');
-  
-  // Clear inputs
-  multiplierInputs.forEach(input => {
-    input.value = '';
-    input.disabled = true;
-  });
-  inputs.forEach(input => {
-    input.value = '';
-    input.classList.add('disabled');
-  });
-  luckyInputs.forEach(input => {
-    input.value = '';
-    input.classList.remove('match');
-  });
-  outputs.forEach(output => output.value = '');
-  autoOuts.forEach(output => output.value = '');
-  
-  // Reset game status
-  gameStatusDisplay.textContent = '💰 Vui lòng nhập Số lượng tên lửa vào kho !!!';
-  gameStatusDisplay.classList.remove('play-prompt', 'warning', 'bet-prompt', 'success-pulse', 'insufficient-funds-pulse', 'wide-notification');
-  gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
-  gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
-  
-  // Clear betting history
-  bettingHistoryPanel.innerHTML = '<div class="bet-history-item">Hệ thống chiến đấu đã sẵn sàng</div>';
-  
-  // Reset enigma state
-  softReset();
-  initState();
-  
-  // Thêm lại class nhấp nháy cho nút nhập vốn
-  setCapitalBtn.classList.add('capital-button-pulse');
-  
-  // Focus on first input
-  inputs[0].focus();
-});
-
-// Initialize
-initRotorDisplay();
-initState();
-softReset();
-updateCapitalDisplay();
-
-// Disable inputs initially
-inputs.forEach(inp => inp.classList.add('disabled'));
-
-// Disable multiplier inputs initially
-multiplierInputs.forEach(inp => inp.disabled = true);
-
-// Đảm bảo nút Play không nhấp nháy khi tải trang
-startBettingBtn.classList.remove('play-pulse');
-
-// Thêm class nhấp nháy cho nút nhập vốn khi tải trang
-setCapitalBtn.classList.add('capital-button-pulse');
-
-// Hiển thị thông báo hướng dẫn nhập vốn
-gameStatusDisplay.textContent = '💰 Vui lòng nhập Số lượng tên lửa vào kho';
-gameStatusDisplay.classList.remove('play-prompt', 'warning', 'bet-prompt');
-gameStatusDisplay.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
-gameStatusDisplay.style.border = '2px solid rgba(245, 158, 11, 0.3)';
-gameStatusDisplay.style.color = '#e2e8f0';
-gameStatusDisplay.style.fontSize = '1.2em';
-
-// Focus vào ô input vốn ban đầu với hiệu ứng nhấp nháy
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    initialCapitalInput.focus();
-    // Thêm hiệu ứng nhấp nháy cho cursor - chạy liên tục
-    initialCapitalInput.classList.add('cursor-blink-active');
-  }, 500);
-});
-
-// Focus ngay lập tức và thêm hiệu ứng nhấp nháy
-initialCapitalInput.focus();
-initialCapitalInput.classList.add('cursor-blink-active');
-
-// Focus on first input after initialization (only if not disabled)
-if (inputs.length > 0 && !inputs[0].classList.contains('disabled')) {
-  inputs[0].focus();
-}
 </script>
-
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
