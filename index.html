@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>5-bit Shift & Sequence</title>
 <style>
- body {
+body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: linear-gradient(135deg, #1e3c72, #2a5298);
   color: #111;
@@ -20,19 +20,49 @@
   background: #ffffff;
   padding: 24px 22px 26px;
   border-radius: 18px;
-  width: 420px;
+  width: fit-content;
+  max-width: 100%;
   box-shadow:
     0 10px 25px rgba(0, 0, 0, 0.12),
     0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+.triple-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(15, 44px);
+  justify-content: center;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .triple-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+
+
+.col {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Nhãn */
 .label {
   font-size: 13px;
-  margin: 14px 0 6px;
+  margin: 6px 0 6px;
   color: #475569;
   font-weight: 600;
   letter-spacing: 0.2px;
+  text-align: center;
 }
 
 /* Hàng các ô */
@@ -40,7 +70,7 @@
   display: flex;
   gap: 8px;
   justify-content: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 /* Ô bit */
@@ -53,14 +83,13 @@
   border: 1px solid #d1d5db;
   background: #f8fafc;
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 /* Kết quả */
 .result {
   background: #ecfdf5;
   border-color: #86efac;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
 }
 
 /* Ô nhập bit */
@@ -70,7 +99,7 @@
   text-align: center;
   font-size: 24px;
   font-weight: 600;
-  margin: 10px auto 0;
+  margin: 12px auto 0;
   display: block;
   border-radius: 12px;
   border: 2px solid #94a3b8;
@@ -85,13 +114,14 @@
 }
 
 /* Grid sequence */
-/* Grid sequence */
 .sequence-grid {
   display: grid;
   grid-template-columns: repeat(15, 24px);
   gap: 6px;
   justify-content: center;
+  margin-top: 6px;
 }
+
 /* Bit sequence */
 .sequence-bit {
   width: 24px;
@@ -120,37 +150,37 @@
   margin-top: 10px;
   color: #64748b;
 }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .triple-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+}
 </style>
 </head>
 
 <body>
 <div class="card">
 
-  <div class="label">5 bit nhập (dịch trái):</div>
-  <div class="row" id="inputs">
-    <input class="box" readonly>
-    <input class="box" readonly>
-    <input class="box" readonly>
-    <input class="box" readonly>
-    <input class="box" readonly>
-  </div>
+  <div class="triple-row">
 
-  <div class="label">Kết quả:</div>
-  <div class="row" id="outputs">
-    <input class="box result" readonly>
-    <input class="box result" readonly>
-    <input class="box result" readonly>
-    <input class="box result" readonly>
-    <input class="box result" readonly>
-  </div>
+    <div class="col">
+      <div class="label">Bit nhập (dịch trái):</div>
+      <div class="row" id="inputs"></div>
+    </div>
 
-  <div class="label">5 bit cắt từ sequence:</div>
-  <div class="row" id="sequenceCut">
-    <input class="box result" readonly>
-    <input class="box result" readonly>
-    <input class="box result" readonly>
-    <input class="box result" readonly>
-    <input class="box result" readonly>
+    <div class="col">
+      <div class="label">Kết quả:</div>
+      <div class="row" id="outputs"></div>
+    </div>
+
+    <div class="col">
+      <div class="label">Bit cắt từ sequence:</div>
+      <div class="row" id="sequenceCut"></div>
+    </div>
+
   </div>
 
   <div class="label">Nhập bit (chỉ 0 / 1):</div>
@@ -162,7 +192,6 @@
   <div id="sequenceDisplay" class="sequence-grid"></div>
 
 </div>
-
 <script>
 /* ====== SEQUENCE ====== */
 const sequence =
@@ -209,16 +238,35 @@ const sequence =
 `;
 
 const seqContainer = document.getElementById("sequenceDisplay");
+const BIT_LEN = 15;
+function createBoxes(containerId, extraClass = "") {
+  const wrap = document.getElementById(containerId);
+  wrap.innerHTML = "";
+
+  for (let i = 0; i < BIT_LEN; i++) {
+    const inp = document.createElement("input");
+    inp.className = "box " + extraClass;
+    inp.readOnly = true;
+    wrap.appendChild(inp);
+  }
+}
+
+createBoxes("inputs");
+createBoxes("outputs", "result");
+createBoxes("sequenceCut", "result");
+
 
 
 // loại bỏ xuống dòng và khoảng trắng
 const cleanSequence = sequence.replace(/\s+/g, "");
 
-// cắt thành các chuỗi 5 bit
-const seq5Blocks = [];
-for (let i = 0; i <= cleanSequence.length - 5; i += 5) {
-  seq5Blocks.push(cleanSequence.slice(i, i + 5));
+// cắt thành các chuỗi BIT_LEN bit
+const seqBlocks = [];
+for (let i = 0; i <= cleanSequence.length - BIT_LEN; i += BIT_LEN) {
+  seqBlocks.push(cleanSequence.slice(i, i + BIT_LEN));
 }
+
+
 [...cleanSequence].forEach(bit => {
   const d = document.createElement("div");
   d.className = "sequence-bit";
@@ -236,7 +284,7 @@ const input6 = document.getElementById("input6");
 const status = document.getElementById("status");
 
 /* ====== STATE ====== */
-let buffer = ["", "", "", "", ""];
+let buffer = Array(BIT_LEN).fill("");
 let count = 0;
 let locked = false;
 
@@ -247,8 +295,9 @@ input6.addEventListener("input", () => {
   const v = input6.value;
   if (v !== "0" && v !== "1") return input6.value = "";
 
-  if (count === 0) {
-    buffer = ["", "", "", "", ""];
+ if (count === 0) {
+  buffer = Array(BIT_LEN).fill("");
+
     inputBoxes.forEach(b => b.value = "");
     outputBoxes.forEach(b => b.value = "");
     seqCutBoxes.forEach(b => b.value = "");
@@ -261,46 +310,51 @@ input6.addEventListener("input", () => {
   count++;
   input6.value = "";
 
-  if (count < 5) {
-    status.textContent = `Đã nhập ${count}/5`;
-    return;
-  }
+  if (count < BIT_LEN) {
+  status.textContent = `Đã nhập ${count}/${BIT_LEN}`;
+  return;
+}
 
   locked = true;
   input6.disabled = true;
   
   
-  const input5 = buffer.join("");
-
-const matchIndex = seq5Blocks.indexOf(input5);
+  const inputBits = buffer.join("");
+const matchIndex = seqBlocks.indexOf(inputBits);
 
 if (matchIndex !== -1) {
-  status.textContent = `✅ Trùng sequence tại block #${matchIndex + 1} (${input5})`;
+  status.textContent = `✅ Trùng sequence tại block #${matchIndex + 1} (${inputBits})`;
 
-  // highlight 5 bit tương ứng trong sequence gốc
+  // highlight BIT_LEN bit tương ứng trong sequence gốc
   document.querySelectorAll(".sequence-bit").forEach(b =>
     b.classList.remove("used")
   );
 
-  const startBit = matchIndex * 5;
+  const startBit = matchIndex * BIT_LEN;
   const seqBits = document.querySelectorAll(".sequence-bit");
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < BIT_LEN; i++) {
+
     if (seqBits[startBit + i]) {
       seqBits[startBit + i].classList.add("used");
       seqCutBoxes[i].value = seqBits[startBit + i].textContent;
+      if (seqCutBoxes[i]) {
+  seqCutBoxes[i].value = seqBits[startBit + i].textContent;
+}
+
     }
   }
 } else {
-  status.textContent = "❌ Không tìm thấy chuỗi 5 bit này trong sequence";
-}
+  status.textContent = "❌ Không tìm thấy chuỗi bit này trong sequence";}
 
 
   setTimeout(() => {
     const sum = buffer.filter(b => b === "1").length;
-    const result = sum >= 3 ? "00101" : "11010";
-    outputBoxes.forEach((b,i)=> b.value = result[i]);
- 
+   const result = sum >= BIT_LEN / 2
+  ? "0".repeat(BIT_LEN - 1) + "1"
+  : "1".repeat(BIT_LEN - 1) + "0";
+
+outputBoxes.forEach((b,i)=> b.value = result[i]);
 
 
     status.textContent = "Hoàn tất. Nhập tiếp chu kỳ mới.";
