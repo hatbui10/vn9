@@ -2,187 +2,172 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Dãy nhị phân tự động</title>
-
+<title>5-bit Shift & Sequence</title>
 <style>
-body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #001BB7;
-    font-family: "Courier New", monospace;
+ body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #111;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 40px 16px;
 }
 
-.container {
-    background: #8b0000;
-    padding: 30px;
-    border-radius: 14px;
-    width: 100%;
-    max-width: 950px;
-    text-align: center;
+/* Card chính */
+.card {
+  background: #ffffff;
+  padding: 24px 22px 26px;
+  border-radius: 18px;
+  width: 420px;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-h1 { color: #fff; }
-
-.binary-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 20px;
+/* Nhãn */
+.label {
+  font-size: 13px;
+  margin: 14px 0 6px;
+  color: #475569;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
-.binary-display {
-    width: 120px;
-    height: 120px;
-    font-size: 80px;
-    font-weight: 900;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: red;
-    border-radius: 16px;
-    border: 4px solid #0d6efd;
-    color: #fff;
+/* Hàng các ô */
+.row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
 }
 
-.binary-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Ô bit */
+.box {
+  width: 44px;
+  height: 44px;
+  text-align: center;
+  font-size: 20px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #f8fafc;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
 }
 
-.binary-label {
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-button {
-    padding: 12px 26px;
-    font-size: 16px;
-    font-weight: 700;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    margin-top: 20px;
-}
-#startBtn {
-    background: #198754;
-    color: #fff;
+/* Kết quả */
+.result {
+  background: #ecfdf5;
+  border-color: #86efac;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
 }
 
-#resetBtn {
-    background: #ffc107;
-    margin-left: 10px;
+/* Ô nhập bit */
+#input6 {
+  width: 80px;
+  height: 46px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 10px auto 0;
+  display: block;
+  border-radius: 12px;
+  border: 2px solid #94a3b8;
+  outline: none;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.shift-row {
-    display: grid;
-    grid-template-columns: repeat(4, 42px);
-    gap: 8px;
-    justify-content: center;
-    margin-top: 10px;
+#input6:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
 
-.shift-cell {
-    height: 42px;
-    background: yellow;
-    color: #ccc;
-    font-size: 22px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
+/* Grid sequence */
+.sequence-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  justify-content: center;
 }
 
-.input-cell {
-    display: block;
-    font-size: 22px;
-    font-weight: bold;
-    font-family: "Courier New", monospace;
-    width: 42px;
-    height: 42px;
-    background: #D6D85D;
-    color: #5C2FC2;
-    text-align: center;
-    caret-color: #000;
-    border: 2px solid #0f0;
-    outline: none;
-}
-
-.sequence-display {
-    margin-top: 25px;
-    background: yellow;
-    padding: 10px;
-    display: grid;
-    grid-template-columns: repeat(30, 26px);
-    gap: 4px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
+/* Bit sequence */
 .sequence-bit {
-    width: 26px;
-    height: 26px;
-    line-height: 26px;
-    text-align: center;
-    background: red;
-    color: #fff; 
-    font-weight: 900;
-    border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  text-align: center;
+  line-height: 24px;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  background: #f8fafc;
+  color: #334155;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.sequence-bit.current {
-    background: #3120E0;
-    color: #000000;
-    opacity: 1;
+/* Bit đã dùng */
+.sequence-bit.used {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #ffffff;
+  border-color: #16a34a;
 }
 
-.sequence-bit.mismatch {
-    background: #5B23FF;
-    color: #fff;
-    opacity: 1;
-}
-
+/* Trạng thái */
 .status {
-    margin-top: 25px;
-    color: #f8f9fa;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 10px;
+  color: #64748b;
 }
 </style>
 </head>
 
 <body>
-<div class="container">
-<h1>Bit 1 lucky @-@ là :</h1>
+<div class="card">
 
-<div class="binary-row">
-    <div class="binary-col">
-        <span class="binary-label">A</span>
-        <div class="binary-display" id="binaryPrev">-</div>
-    </div>
-    <div class="binary-col">
-        <span class="binary-label">B</span>
-        <div class="binary-display" id="binaryNow">-</div>
-    </div>
+  <div class="label">5 bit nhập (dịch trái):</div>
+  <div class="row" id="inputs">
+    <input class="box" readonly>
+    <input class="box" readonly>
+    <input class="box" readonly>
+    <input class="box" readonly>
+    <input class="box" readonly>
+  </div>
+
+  <div class="label">Kết quả:</div>
+  <div class="row" id="outputs">
+    <input class="box result" readonly>
+    <input class="box result" readonly>
+    <input class="box result" readonly>
+    <input class="box result" readonly>
+    <input class="box result" readonly>
+  </div>
+
+  <div class="label">5 bit cắt từ sequence:</div>
+  <div class="row" id="sequenceCut">
+    <input class="box result" readonly>
+    <input class="box result" readonly>
+    <input class="box result" readonly>
+    <input class="box result" readonly>
+    <input class="box result" readonly>
+  </div>
+
+  <div class="label">Nhập bit (chỉ 0 / 1):</div>
+  <input id="input6" maxlength="1" inputmode="numeric">
+
+  <div class="status" id="status"></div>
+
+  <div class="label">Sequence gốc:</div>
+  <div id="sequenceDisplay" class="sequence-grid"></div>
+
 </div>
 
-<div class="shift-row">
-    <div class="shift-cell">-</div>
-    <div class="shift-cell">-</div>
-    <div class="shift-cell">-</div>
-    <input class="shift-cell input-cell" id="inputCell" maxlength="1">
-</div>
-
-<div class="controls">
-    <button id="startBtn">Bắt đầu</button>
-    <button id="resetBtn">Reset</button>
-</div>
-
-<div class="status" id="status">READY</div>
-
-<div class="sequence-display" id="sequenceDisplay">
-00000000011101110111011109999900010001010001000011011101010110100110000000101101000000000011110110101001100000111100110011110110111000000001100100101110101011001000010010100110010011101011101000011100001100100110111011010001111100001001101100010001101010101010000000010111110010010110001000010100100010010111001001010101000110111110001010110100101000101101000100101101101000110101011110001000010011100101101011011001001110111111101110011110101010000000001000100101001100010110110000110111101000001000001110111110110011011010000111
+<script>
+/* ====== SEQUENCE ====== */
+const sequence =
+`00010001010001000011011101010110100110000000101101000000000011110110101001100000111100110011110110111000000001100100101110101011001000010010100110010011101011101000011100001100100110111011010001111100001001101100010001101010101010000000010111110010010110001000010100100010010111001001010101000110111110001010110100101000101101000100101101101000110101011110001000010011100101101011011001001110111111101110011110101010000000001000100101001100010110110000110111101000001000001110111110110011011010000111
 01010111111111011001001010100011111010111000100100010111100100000111000100001100000110111110011011110100000110010111010001111011001010000100010001011100101111010011011101110111110011010010011110110001001110111101110011001001101011000111101110110001101000110111100011100110001000000111111000111001101111100011001000001011001011010011111110011111111010111111100111010000000010011001111000000101100001110101011000001010110000111001011001010110011011110100011001000010011111101101001000111010000010101110
 11111111011000111111000001000100001110100011001100001001001100111001100011000001111110000110111000110010010000010101010000110000101010110111100110000100100111000001110001001101010000101111100100101110010100100000111011111011110110010000000100100101101100010100110101011010110010101010010111111111010111000000110110111001101010011111001101100001001100100100111100100010111010011100011100000111110111011011111110101000110101001100101010100001001010101000000101100011111000111110010010000111000100011001
 10001110100010010110010000110100001001111100111011001001111101011111101011010111011111111011011101100001101011101011100010011011001100000001100011101110101100011111001010001000111001100011101110101101110110100011110111001000000111011011001111100001111000010101000110001110101001011100000011011000011011111100000110110001011001011101010011111110101111101000110110101010101010111011100110000010011111001100011000101100010100110010111001110101111000100100111000111000111111111001101011000111101101110000
@@ -221,140 +206,90 @@ button {
 00011110110100101111011100110000110111110111011101001111111001111110011101011101111000000101101111000101111100000111010011000101110001011100100010101101100100100101000111100110100010110111011101001000011000011011101011100111100000000101010111010101010010100011101010100111101111100111001010100101000011100100011111010011001101000110111011100010101100110110100101010010011100100101011011001110000110101000111010011111010100001010000000001000111111101100001101110110001101101000100000100101001111011010
 00010100011010110101101000000010111010001110111010101100101111010010010101101001001100110111000001111100000000010001110011011011100011100001110111110010000110111001010101111111000001011111001010111010000110101101001111111011100010000100100110111110010101000111011000001110001100010110110001110000100101100100111001000011011100111101011010101110100101111101111111100010111011111011111011100011101010001100100000011110101001011100101000101100101110011011100100101000110001011101101010110001001111101010
 00001000110111100111000011101001011100111100111110101011101011010011001111111110110000000110111101010001011010100100100000110100100101100001111001000110101111011000001101000010001111111000010101101000010101001110011111001100010110001101011001101011000110001000000011101111011111110000100001010011111100001101101111100000110100000001010001110110010000101001111000101110010000000110001101101010000110010111111111101001000111011001011111001111100001000100010101011010110110011110011001100110010010011000
-1110110100110011111111111101101001101110000001010011111011001111011100110011100111101100101101111000100001110111011011011111111111100000101100111010111111100001101110110001010011000000100101001000111011101000010011111110110001011011010101101001011010010001011001010110011100100011000010111111111001010101101110010110000100110110100101110001011100100010001000001001111101101001110001110111011011101000111101101111011011110001011110100001110011111111110111101010100001010101010101100100001110    </div>
-</div></div>
+1110110100110011111111111101101001101110000001010011111011001111011100110011100111101100101101111000100001110111011011011111111111100000101100111010111111100001101110110001010011000000100101001000111011101000010011111110110001011011010101101001011010010001011001010110011100100011000010111111111001010101101110010110000100110110100101110001011100100010001000001001111101101001110001110111011011101000111101101111011011110001011110100001110011111111110111101010100001010101010101100100001110
+`;
 
-<script>
-/* ===== LẤY ELEMENT ===== */
-const sequenceDisplay = document.getElementById("sequenceDisplay");
-const binaryPrevEl    = document.getElementById("binaryPrev");
-const binaryNowEl     = document.getElementById("binaryNow");
-const inputCell       = document.getElementById("inputCell");
-const cells           = document.querySelectorAll(".shift-cell:not(.input-cell)");
-
-/* ===== SEQUENCE ===== */
-const binarySequence = sequenceDisplay.textContent
-    .trim()
-    .replace(/\s+/g, "")
-    .split("");
-
-/* ===== CON TRỎ SEQUENCE (CHẠY THEO INPUT) ===== */
-let currentSeqIndex = 0;
-
-/* ===== FLAG TÔ MÀU ===== */
-let mismatch = new Array(binarySequence.length).fill(false);
-
-/* ===== LỊCH SỬ GIÁ TRỊ A ===== */
-let aHistory = [];
-
-/* ===== RENDER SEQUENCE ===== */
-function renderSequence() {
-    let html = "";
-    binarySequence.forEach((bit, i) => {
-        let cls = "sequence-bit";
-        if (i === currentSeqIndex) cls += " current";
-        if (mismatch[i]) cls += " mismatch";
-        html += `<span class="${cls}">${bit}</span>`;
-    });
-    sequenceDisplay.innerHTML = html;
-}
-renderSequence();
-
-/* ===== TÍNH A ===== */
-function calcBinary() {
-    const [a, b, c] = [...cells].map(cell => cell.textContent);
-    if ([a, b, c].includes("-")) return "-";
-    if (a === b) return c;
-    return "1";
-}
-
-/* ===== TRẠNG THÁI SO SÁNH ===== */
-let aCount = 0;          // số lần A hợp lệ
-let compareStarted = false;
-const startCompareAtSeq = 5; // khi sequence tới ô 5
-const firstCompareIndex = 4; // so với sequence[4]
-
-/* ===== SO SÁNH VÀ TÔ MÀU KHI SEQUENCE Ở Ô5 VÀ A CÓ GIÁ TRỊ ===== */
-function compareAndHighlight() {
-    // Chỉ so sánh khi đã có đủ điều kiện
-    if (currentSeqIndex >= startCompareAtSeq && binaryNowEl.textContent !== "-") {
-        const A_value = binaryNowEl.textContent; // Giá trị A hiện tại
-        
-        // Lưu giá trị A vào lịch sử
-        aHistory.push(A_value);
-        
-        // So sánh A1 với sequence 4
-        if (binarySequence[firstCompareIndex] !== A_value) {
-            mismatch[firstCompareIndex] = true;
-        }
-        
-        // So sánh các giá trị A trước đó với các sequence tương ứng
-        for (let i = 0; i < aHistory.length - 1; i++) {
-            const seqIndex = firstCompareIndex + i + 1;
-            if (seqIndex < binarySequence.length) {
-                if (binarySequence[seqIndex] !== aHistory[i]) {
-                    mismatch[seqIndex] = true;
-                }
-            }
-        }
-    }
-}
-
-/* ===== INPUT ===== */
-inputCell.addEventListener("input", () => {
-    const v = inputCell.value;
-
-    if (!/^[01]$/.test(v)) {
-        inputCell.value = "";
-        return;
-    }
-
-    /* ===== SHIFT ===== */
-    for (let i = 0; i < cells.length - 1; i++) {
-        cells[i].textContent = cells[i + 1].textContent;
-    }
-    cells[cells.length - 1].textContent = v;
-    inputCell.value = "";
-
-    /* ===== SEQUENCE NHẢY THEO INPUT ===== */
-    if (currentSeqIndex < binarySequence.length - 1) {
-        currentSeqIndex++;
-    }
-
-    /* ===== TÍNH A ===== */
-    const result = calcBinary();
-
-    /* ===== HIỂN THỊ A / B ===== */
-    binaryPrevEl.textContent = binaryNowEl.textContent;
-    binaryNowEl.textContent  = result;
-
-    /* ===== SO SÁNH VÀ TÔ MÀU ===== */
-    compareAndHighlight();
-
-    renderSequence();
-    inputCell.focus();
+const seqContainer = document.getElementById("sequenceDisplay");
+[...sequence].forEach(bit => {
+  const d = document.createElement("div");
+  d.className = "sequence-bit";
+  d.textContent = bit;
+  seqContainer.appendChild(d);
 });
 
-/* ===== RESET ===== */
-document.getElementById("resetBtn").onclick = () => {
-    cells.forEach(c => c.textContent = "-");
-    inputCell.value = "";
-    binaryPrevEl.textContent = "-";
-    binaryNowEl.textContent  = "-";
+let seqIndex = 0;
 
-    currentSeqIndex = 0;
-    aCount = 0;
-    compareStarted = false;
-    mismatch.fill(false);
-    aHistory = [];
+/* ====== ELEMENTS ====== */
+const inputBoxes = document.querySelectorAll("#inputs input");
+const outputBoxes = document.querySelectorAll("#outputs input");
+const seqCutBoxes = document.querySelectorAll("#sequenceCut input");
+const input6 = document.getElementById("input6");
+const status = document.getElementById("status");
 
-    renderSequence();
-    inputCell.focus();
-};
+/* ====== STATE ====== */
+let buffer = ["", "", "", "", ""];
+let count = 0;
+let locked = false;
 
-window.addEventListener("load", () => inputCell.focus());
+/* ====== INPUT ====== */
+input6.addEventListener("input", () => {
+  if (locked) return input6.value = "";
+
+  const v = input6.value;
+  if (v !== "0" && v !== "1") return input6.value = "";
+
+  if (count === 0) {
+    buffer = ["", "", "", "", ""];
+    inputBoxes.forEach(b => b.value = "");
+    outputBoxes.forEach(b => b.value = "");
+    seqCutBoxes.forEach(b => b.value = "");
+  }
+
+  buffer.shift();
+  buffer.push(v);
+  inputBoxes.forEach((b,i)=> b.value = buffer[i]);
+
+  count++;
+  input6.value = "";
+
+  if (count < 5) {
+    status.textContent = `Đã nhập ${count}/5`;
+    return;
+  }
+
+  locked = true;
+  input6.disabled = true;
+
+  setTimeout(() => {
+    const sum = buffer.filter(b => b === "1").length;
+    const result = sum >= 3 ? "00101" : "11010";
+    outputBoxes.forEach((b,i)=> b.value = result[i]);
+    // xóa màu cũ
+document.querySelectorAll(".sequence-bit").forEach(b => 
+  b.classList.remove("used")
+);
+
+
+    const seqBits = document.querySelectorAll(".sequence-bit");
+    for (let i = 0; i < 5; i++) {
+      const bit = seqBits[seqIndex + i];
+      if (!bit) break;
+      bit.classList.add("used");
+      seqCutBoxes[i].value = bit.textContent;
+    }
+    seqIndex += 5;
+
+    status.textContent = "Hoàn tất. Nhập tiếp chu kỳ mới.";
+    count = 0;
+    locked = false;
+    input6.disabled = false;
+    input6.focus();
+  }, 400);
+});
+window.addEventListener("load", () => {
+  input6.focus();
+});
 </script>
-
 </body>
 </html>
 
