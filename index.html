@@ -85,14 +85,13 @@
 }
 
 /* Grid sequence */
+/* Grid sequence */
 .sequence-grid {
   display: grid;
   grid-template-columns: repeat(15, 24px);
   gap: 6px;
   justify-content: center;
 }
-
-
 /* Bit sequence */
 .sequence-bit {
   width: 24px;
@@ -210,14 +209,24 @@ const sequence =
 `;
 
 const seqContainer = document.getElementById("sequenceDisplay");
-[...sequence].forEach(bit => {
+
+
+// loại bỏ xuống dòng và khoảng trắng
+const cleanSequence = sequence.replace(/\s+/g, "");
+
+// cắt thành các chuỗi 5 bit
+const seq5Blocks = [];
+for (let i = 0; i <= cleanSequence.length - 5; i += 5) {
+  seq5Blocks.push(cleanSequence.slice(i, i + 5));
+}
+[...cleanSequence].forEach(bit => {
   const d = document.createElement("div");
   d.className = "sequence-bit";
   d.textContent = bit;
   seqContainer.appendChild(d);
 });
 
-let seqIndex = 0;
+ 
 
 /* ====== ELEMENTS ====== */
 const inputBoxes = document.querySelectorAll("#inputs input");
@@ -259,25 +268,40 @@ input6.addEventListener("input", () => {
 
   locked = true;
   input6.disabled = true;
+  
+  
+  const input5 = buffer.join("");
+
+const matchIndex = seq5Blocks.indexOf(input5);
+
+if (matchIndex !== -1) {
+  status.textContent = `✅ Trùng sequence tại block #${matchIndex + 1} (${input5})`;
+
+  // highlight 5 bit tương ứng trong sequence gốc
+  document.querySelectorAll(".sequence-bit").forEach(b =>
+    b.classList.remove("used")
+  );
+
+  const startBit = matchIndex * 5;
+  const seqBits = document.querySelectorAll(".sequence-bit");
+
+  for (let i = 0; i < 5; i++) {
+    if (seqBits[startBit + i]) {
+      seqBits[startBit + i].classList.add("used");
+      seqCutBoxes[i].value = seqBits[startBit + i].textContent;
+    }
+  }
+} else {
+  status.textContent = "❌ Không tìm thấy chuỗi 5 bit này trong sequence";
+}
+
 
   setTimeout(() => {
     const sum = buffer.filter(b => b === "1").length;
     const result = sum >= 3 ? "00101" : "11010";
     outputBoxes.forEach((b,i)=> b.value = result[i]);
-    // xóa màu cũ
-document.querySelectorAll(".sequence-bit").forEach(b => 
-  b.classList.remove("used")
-);
+ 
 
-
-    const seqBits = document.querySelectorAll(".sequence-bit");
-    for (let i = 0; i < 5; i++) {
-      const bit = seqBits[seqIndex + i];
-      if (!bit) break;
-      bit.classList.add("used");
-      seqCutBoxes[i].value = bit.textContent;
-    }
-    seqIndex += 5;
 
     status.textContent = "Hoàn tất. Nhập tiếp chu kỳ mới.";
     count = 0;
@@ -292,5 +316,4 @@ window.addEventListener("load", () => {
 </script>
 </body>
 </html>
-
 
