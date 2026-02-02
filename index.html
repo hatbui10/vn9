@@ -86,12 +86,12 @@
 
 /* Grid sequence */
 .sequence-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(15, 24px);
   gap: 6px;
-  margin-top: 12px;
   justify-content: center;
 }
+
 
 /* Bit sequence */
 .sequence-bit {
@@ -292,4 +292,5 @@ window.addEventListener("load", () => {
 </script>
 </body>
 </html>
+
 
