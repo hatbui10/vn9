@@ -50,11 +50,6 @@ body {
 
 
 
-.col {
-  flex: 1;
-  min-width: 0;
-}
-
 /* Nhãn */
 .label {
   font-size: 13px;
@@ -65,13 +60,6 @@ body {
   text-align: center;
 }
 
-/* Hàng các ô */
-.row {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 8px;
-}
 
 /* Ô bit */
 .box {
@@ -237,13 +225,17 @@ const sequence =
 1110110100110011111111111101101001101110000001010011111011001111011100110011100111101100101101111000100001110111011011011111111111100000101100111010111111100001101110110001010011000000100101001000111011101000010011111110110001011011010101101001011010010001011001010110011100100011000010111111111001010101101110010110000100110110100101110001011100100010001000001001111101101001110001110111011011101000111101101111011011110001011110100001110011111111110111101010100001010101010101100100001110
 `;
 
+/* ====== CONSTANTS ====== */
 const seqContainer = document.getElementById("sequenceDisplay");
-const BIT_LEN = 15;
-function createBoxes(containerId, extraClass = "") {
+const BIT_LEN = 15;     // số bit nhập / block
+const RESULT_LEN = 5;  // số bit lấy sau block
+
+/* ====== BOX CREATOR ====== */
+function createBoxes(containerId, count, extraClass = "") {
   const wrap = document.getElementById(containerId);
   wrap.innerHTML = "";
 
-  for (let i = 0; i < BIT_LEN; i++) {
+  for (let i = 0; i < count; i++) {
     const inp = document.createElement("input");
     inp.className = "box " + extraClass;
     inp.readOnly = true;
@@ -251,30 +243,28 @@ function createBoxes(containerId, extraClass = "") {
   }
 }
 
-createBoxes("inputs");
-createBoxes("outputs", "result");
-createBoxes("sequenceCut", "result");
+/* ====== INIT BOXES ====== */
+createBoxes("inputs", BIT_LEN);
+createBoxes("outputs", RESULT_LEN, "result");
+createBoxes("sequenceCut", BIT_LEN, "result"); // GIỮ 15 Ô
 
-
-
-// loại bỏ xuống dòng và khoảng trắng
+/* ====== PREPARE SEQUENCE ====== */
+// giả định biến `sequence` đã tồn tại
 const cleanSequence = sequence.replace(/\s+/g, "");
 
-// cắt thành các chuỗi BIT_LEN bit
+// chia sequence thành các block 15 bit
 const seqBlocks = [];
 for (let i = 0; i <= cleanSequence.length - BIT_LEN; i += BIT_LEN) {
   seqBlocks.push(cleanSequence.slice(i, i + BIT_LEN));
 }
 
-
+// render sequence gốc
 [...cleanSequence].forEach(bit => {
   const d = document.createElement("div");
   d.className = "sequence-bit";
   d.textContent = bit;
   seqContainer.appendChild(d);
 });
-
- 
 
 /* ====== ELEMENTS ====== */
 const inputBoxes = document.querySelectorAll("#inputs input");
@@ -288,82 +278,88 @@ let buffer = Array(BIT_LEN).fill("");
 let count = 0;
 let locked = false;
 
-/* ====== INPUT ====== */
+/* ====== INPUT HANDLER ====== */
 input6.addEventListener("input", () => {
-  if (locked) return input6.value = "";
+  if (locked) {
+    input6.value = "";
+    return;
+  }
 
   const v = input6.value;
-  if (v !== "0" && v !== "1") return input6.value = "";
+  if (v !== "0" && v !== "1") {
+    input6.value = "";
+    return;
+  }
 
- if (count === 0) {
-  buffer = Array(BIT_LEN).fill("");
-
+  // reset chu kỳ mới
+  if (count === 0) {
+    buffer = Array(BIT_LEN).fill("");
     inputBoxes.forEach(b => b.value = "");
     outputBoxes.forEach(b => b.value = "");
     seqCutBoxes.forEach(b => b.value = "");
   }
 
+  // dịch trái + push bit mới
   buffer.shift();
   buffer.push(v);
-  inputBoxes.forEach((b,i)=> b.value = buffer[i]);
+  inputBoxes.forEach((b, i) => b.value = buffer[i]);
 
   count++;
   input6.value = "";
 
   if (count < BIT_LEN) {
-  status.textContent = `Đã nhập ${count}/${BIT_LEN}`;
-  return;
-}
+    status.textContent = `Đã nhập ${count}/${BIT_LEN}`;
+    return;
+  }
 
+  // đủ 15 bit → khóa input
   locked = true;
   input6.disabled = true;
-  
-  
+
   const inputBits = buffer.join("");
-const matchIndex = seqBlocks.indexOf(inputBits);
+  const matchIndex = seqBlocks.indexOf(inputBits);
 
-if (matchIndex !== -1) {
-  status.textContent = `✅ Trùng sequence tại block #${matchIndex + 1} (${inputBits})`;
-
-  // highlight BIT_LEN bit tương ứng trong sequence gốc
+  // clear highlight cũ
   document.querySelectorAll(".sequence-bit").forEach(b =>
     b.classList.remove("used")
   );
 
-  const startBit = matchIndex * BIT_LEN;
-  const seqBits = document.querySelectorAll(".sequence-bit");
+  if (matchIndex !== -1) {
+    status.textContent = `✅ Trùng sequence tại block #${matchIndex + 1}`;
 
-  for (let i = 0; i < BIT_LEN; i++) {
+    const startBit = matchIndex * BIT_LEN;
+    const seqBits = document.querySelectorAll(".sequence-bit");
 
-    if (seqBits[startBit + i]) {
-      seqBits[startBit + i].classList.add("used");
-      seqCutBoxes[i].value = seqBits[startBit + i].textContent;
-      if (seqCutBoxes[i]) {
-  seqCutBoxes[i].value = seqBits[startBit + i].textContent;
-}
-
+    // fill 15 bit trùng vào sequenceCut + highlight
+    for (let i = 0; i < BIT_LEN; i++) {
+      if (seqBits[startBit + i]) {
+        seqBits[startBit + i].classList.add("used");
+        seqCutBoxes[i].value = seqBits[startBit + i].textContent;
+      }
     }
+
+    // lấy 5 bit sau block
+    const resultStart = startBit + BIT_LEN;
+    for (let i = 0; i < RESULT_LEN; i++) {
+      outputBoxes[i].value = seqBits[resultStart + i]
+        ? seqBits[resultStart + i].textContent
+        : "";
+    }
+
+  } else {
+    status.textContent = "❌ Không tìm thấy chuỗi bit này trong sequence";
   }
-} else {
-  status.textContent = "❌ Không tìm thấy chuỗi bit này trong sequence";}
 
-
+  // mở khóa cho chu kỳ mới
   setTimeout(() => {
-    const sum = buffer.filter(b => b === "1").length;
-   const result = sum >= BIT_LEN / 2
-  ? "0".repeat(BIT_LEN - 1) + "1"
-  : "1".repeat(BIT_LEN - 1) + "0";
-
-outputBoxes.forEach((b,i)=> b.value = result[i]);
-
-
-    status.textContent = "Hoàn tất. Nhập tiếp chu kỳ mới.";
     count = 0;
     locked = false;
     input6.disabled = false;
     input6.focus();
-  }, 400);
+  }, 300);
 });
+
+/* ====== AUTO FOCUS ====== */
 window.addEventListener("load", () => {
   input6.focus();
 });
