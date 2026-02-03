@@ -198,6 +198,8 @@ body {
   readonly
   placeholder="Chưa có dữ liệu..."></textarea>
 <button id="clearHistory" class="reset-btn">Xoá lịch sử</button>
+<button id="downloadHistory">Tải lịch sử (.txt)</button>
+
 
 
   <div class="status" id="status"></div>
@@ -402,6 +404,29 @@ clearBtn.onclick = () => {
   localStorage.removeItem(STORAGE_KEY);
   historyBox.value = "";
 };
+
+document.getElementById("downloadHistory").onclick = () => {
+  const historyBox = document.getElementById("history");
+  const content = historyBox.value;
+
+  if (!content) {
+    alert("Không có dữ liệu để tải");
+    return;
+  }
+
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "bit_history.txt";
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
 
 /* ====== AUTO FOCUS ====== */
 window.addEventListener("load", () => {
