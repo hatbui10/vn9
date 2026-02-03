@@ -101,13 +101,20 @@ body {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
 }
 
-/* Grid sequence */
 .sequence-grid {
   display: grid;
   grid-template-columns: repeat(10, 24px);
   gap: 6px;
   justify-content: center;
+
+  max-height: 140px;      /* chiều cao giới hạn */
+  overflow-y: auto;       /* cuộn dọc */
+  padding: 6px 4px;       /* tránh che viền khi cuộn */
   margin-top: 6px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
 }
 
 /* Bit sequence */
@@ -146,6 +153,18 @@ body {
     gap: 14px;
   }
 }
+
+#history {
+  width: 100%;
+  resize: none;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
 </style>
 </head>
 
@@ -173,6 +192,13 @@ body {
 
   <div class="label">Nhập bit (chỉ 0 / 1):</div>
   <input id="input6" maxlength="1" inputmode="numeric">
+  <div class="label">Lịch sử bit đã nhập:</div>
+<textarea id="history"
+  rows="4"
+  readonly
+  placeholder="Chưa có dữ liệu..."></textarea>
+<button id="clearHistory" class="reset-btn">Xoá lịch sử</button>
+
 
   <div class="status" id="status"></div>
 
@@ -229,6 +255,7 @@ const sequence =
 const seqContainer = document.getElementById("sequenceDisplay");
 const BIT_LEN = 10;     // số bit nhập / block
 const RESULT_LEN = 5;  // số bit lấy sau block
+const STORAGE_KEY = "bit_history";
 
 /* ====== BOX CREATOR ====== */
 function createBoxes(containerId, count, extraClass = "") {
@@ -246,13 +273,13 @@ function createBoxes(containerId, count, extraClass = "") {
 /* ====== INIT BOXES ====== */
 createBoxes("inputs", BIT_LEN);
 createBoxes("outputs", RESULT_LEN, "result");
-createBoxes("sequenceCut", BIT_LEN, "result"); // GIỮ 15 Ô
+createBoxes("sequenceCut", BIT_LEN, "result");
 
 /* ====== PREPARE SEQUENCE ====== */
 // giả định biến `sequence` đã tồn tại
 const cleanSequence = sequence.replace(/\s+/g, "");
 
-// chia sequence thành các block 15 bit
+// chia sequence thành các block BIT_LEN
 const seqBlocks = [];
 for (let i = 0; i <= cleanSequence.length - BIT_LEN; i += BIT_LEN) {
   seqBlocks.push(cleanSequence.slice(i, i + BIT_LEN));
@@ -272,6 +299,12 @@ const outputBoxes = document.querySelectorAll("#outputs input");
 const seqCutBoxes = document.querySelectorAll("#sequenceCut input");
 const input6 = document.getElementById("input6");
 const status = document.getElementById("status");
+const historyBox = document.getElementById("history");
+const clearBtn = document.getElementById("clearHistory");
+
+/* ====== HISTORY INIT ====== */
+let historyBits = localStorage.getItem(STORAGE_KEY) || "";
+historyBox.value = historyBits;
 
 /* ====== STATE ====== */
 let buffer = Array(BIT_LEN).fill("");
@@ -291,14 +324,6 @@ input6.addEventListener("input", () => {
     return;
   }
 
-  // reset chu kỳ mới
-  if (count === 0) {
-    buffer = Array(BIT_LEN).fill("");
-    inputBoxes.forEach(b => b.value = "");
-    outputBoxes.forEach(b => b.value = "");
-    seqCutBoxes.forEach(b => b.value = "");
-  }
-
   // dịch trái + push bit mới
   buffer.shift();
   buffer.push(v);
@@ -312,11 +337,17 @@ input6.addEventListener("input", () => {
     return;
   }
 
-  // đủ 15 bit → khóa input
+  /* ====== ĐỦ BIT_LEN ====== */
   locked = true;
   input6.disabled = true;
 
   const inputBits = buffer.join("");
+
+  // lưu lịch sử (GHÉP LIỀN)
+  historyBits += inputBits;
+  localStorage.setItem(STORAGE_KEY, historyBits);
+  historyBox.value = historyBits;
+
   const matchIndex = seqBlocks.indexOf(inputBits);
 
   // clear highlight cũ
@@ -324,13 +355,17 @@ input6.addEventListener("input", () => {
     b.classList.remove("used")
   );
 
+  // clear output cũ
+  outputBoxes.forEach(b => b.value = "");
+  seqCutBoxes.forEach(b => b.value = "");
+
   if (matchIndex !== -1) {
     status.textContent = `✅ Trùng sequence tại block #${matchIndex + 1}`;
 
     const startBit = matchIndex * BIT_LEN;
     const seqBits = document.querySelectorAll(".sequence-bit");
 
-    // fill 15 bit trùng vào sequenceCut + highlight
+    // fill BIT_LEN bit trùng + highlight
     for (let i = 0; i < BIT_LEN; i++) {
       if (seqBits[startBit + i]) {
         seqBits[startBit + i].classList.add("used");
@@ -338,7 +373,7 @@ input6.addEventListener("input", () => {
       }
     }
 
-    // lấy 5 bit sau block
+    // lấy RESULT_LEN bit sau block
     const resultStart = startBit + BIT_LEN;
     for (let i = 0; i < RESULT_LEN; i++) {
       outputBoxes[i].value = seqBits[resultStart + i]
@@ -350,8 +385,10 @@ input6.addEventListener("input", () => {
     status.textContent = "❌ Không tìm thấy chuỗi bit này trong sequence";
   }
 
-  // mở khóa cho chu kỳ mới
+  // mở chu kỳ mới
   setTimeout(() => {
+    buffer = Array(BIT_LEN).fill("");
+    inputBoxes.forEach(b => b.value = "");
     count = 0;
     locked = false;
     input6.disabled = false;
@@ -359,12 +396,21 @@ input6.addEventListener("input", () => {
   }, 300);
 });
 
+/* ====== CLEAR HISTORY ====== */
+clearBtn.onclick = () => {
+  historyBits = "";
+  localStorage.removeItem(STORAGE_KEY);
+  historyBox.value = "";
+};
+
 /* ====== AUTO FOCUS ====== */
 window.addEventListener("load", () => {
   input6.focus();
 });
+
 </script>
 </body>
 </html>
+
 
 
