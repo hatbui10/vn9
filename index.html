@@ -168,6 +168,23 @@ body {
       0 0 32px rgba(239,68,68,.9);
   }
 }
+#clearHistory {
+  margin-top: 8px;
+  padding: 6px 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #7c2d12, #dc2626);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(220,38,38,.6);
+  transition: transform .15s, box-shadow .15s;
+}
+
+#clearHistory:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 14px rgba(220,38,38,.9);
+}
 
 
 </style>
@@ -195,6 +212,23 @@ body {
 
   <div class="label">Sequence (hiển thị quanh block trùng)</div>
   <div id="sequenceDisplay" class="sequence-grid"></div>
+<div class="label">Lịch sử bit đã nhập</div>
+<textarea
+  id="history"
+  rows="4"
+  style="
+    width: 100%;
+    max-width: 420px;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    font-family: monospace;
+    font-size: 14px;
+    resize: vertical;
+  "
+  readonly
+></textarea>
+<button id="clearHistory">Xóa lịch sử</button>
 
 </div>
 
@@ -249,11 +283,19 @@ const seqContainer = document.getElementById("sequenceDisplay");
 const inputBit = document.getElementById("inputBit");
 const status = document.getElementById("status");
 
-
 const inputBoxes = document.querySelectorAll("#inputs input");
 const seqCutBoxes = document.querySelectorAll("#sequenceCut input");
 const outputBoxes = document.querySelectorAll("#outputs input");
+const clearBtn = document.getElementById("clearHistory");
+const historyBox = document.getElementById("history");
+clearBtn.addEventListener("click", () => {
+  localStorage.removeItem("bitHistory");
+  historyBox.value = "";
+});
 
+// load lịch sử bit đã lưu
+const savedHistory = localStorage.getItem("bitHistory") || "";
+historyBox.value = savedHistory;
 
 /* ===== LOAD SEQUENCE ===== */
 fetch(IPFS_URL)
@@ -307,13 +349,20 @@ inputBit.addEventListener("input", () => {
   count++;
 
   if (count < BIT_LEN) return;
-
   locked = true;
   const inputBits = buffer.join("");
 
   let matchIndex = -1;
 
-  // CẮT TỪ KÝ TỰ ĐẦU, MỖI BLOCK 10 BIT
+
+  // lưu 10 bit đã nhập vào lịch sử
+let history = localStorage.getItem("bitHistory") || "";
+history += inputBits;
+
+localStorage.setItem("bitHistory", history);
+historyBox.value = history;
+
+    // CẮT TỪ KÝ TỰ ĐẦU, MỖI BLOCK 10 BIT
   for (let i = 0; i + BIT_LEN <= cleanSequence.length; i += BIT_LEN) {
     if (cleanSequence.slice(i, i + BIT_LEN) === inputBits) {
       matchIndex = i;
