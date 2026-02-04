@@ -141,6 +141,31 @@ body {
   margin-top: 8px;
 }
 
+/* ===== NOT BIT LUNG LINH ===== */
+/* ===== NOT BIT LUNG LINH (VÀNG ĐỎ) ===== */
+.box.not {
+  background: linear-gradient(135deg, #facc15, #ef4444);
+  color: #fff;
+  border: none;
+  box-shadow:
+    0 0 8px rgba(250,204,21,.7),
+    0 0 18px rgba(239,68,68,.8);
+  animation: glow-fire 1.3s ease-in-out infinite alternate;
+}
+
+@keyframes glow-fire {
+  from {
+    box-shadow:
+      0 0 6px rgba(250,204,21,.5),
+      0 0 14px rgba(239,68,68,.5);
+  }
+  to {
+    box-shadow:
+      0 0 16px rgba(250,204,21,.9),
+      0 0 32px rgba(239,68,68,.9);
+  }
+}
+
 
 </style>
 </head>
@@ -156,6 +181,10 @@ body {
 
   <div class="label">5 bit sau block</div>
   <div class="row" id="outputs"></div>
+  
+  <div class="label">5 bit đảo (NOT)</div>
+<div class="row" id="outputsNot"></div>
+
 
   <input id="inputBit" maxlength="1" inputmode="numeric">
 
@@ -194,6 +223,11 @@ createBoxes("inputs", BIT_LEN);
 createBoxes("outputs", RESULT_LEN, "result");
 createBoxes("sequenceCut", BIT_LEN, "result");
 
+createBoxes("outputsNot", RESULT_LEN, "result not");
+
+const outputNotBoxes =
+  document.querySelectorAll("#outputsNot input");
+
 /* ===== AUTO WIDTH FOR ROW ===== */
 document.querySelectorAll(".row").forEach(row => {
   const count = row.children.length;
@@ -216,6 +250,7 @@ const status = document.getElementById("status");
 const inputBoxes = document.querySelectorAll("#inputs input");
 const seqCutBoxes = document.querySelectorAll("#sequenceCut input");
 const outputBoxes = document.querySelectorAll("#outputs input");
+
 
 /* ===== LOAD SEQUENCE ===== */
 fetch(IPFS_URL)
@@ -294,10 +329,13 @@ inputBit.addEventListener("input", () => {
       seqCutBoxes[i].value = cleanSequence[matchIndex + i];
     }
 
-    for (let i = 0; i < RESULT_LEN; i++) {
-      outputBoxes[i].value =
-        cleanSequence[matchIndex + BIT_LEN + i] || "";
-    }
+   for (let i = 0; i < RESULT_LEN; i++) {
+  const bit = cleanSequence[matchIndex + BIT_LEN + i] || "";
+  outputBoxes[i].value = bit;
+
+  // NOT bit: 1->0, 0->1
+  outputNotBoxes[i].value = bit === "1" ? "0" : "1";
+}
 
     renderPreview(matchIndex / BIT_LEN);
   } else {
@@ -315,4 +353,7 @@ inputBit.addEventListener("input", () => {
 </script>
 </body>
 </html>
+
+
+
 
